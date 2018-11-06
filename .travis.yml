@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.3"
+  - "3.2"
 # command to install dependencies
 install:
   - pip install -r requirements.txt
@@ -12,4 +12,4 @@ script:
   - nosetests courier_app/tests --with-coverage --cover-package=courier_app
 after_success:
   - coverallslanguage: python
-- coveralls
+  - coveralls
