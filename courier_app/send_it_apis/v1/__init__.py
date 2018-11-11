@@ -34,11 +34,12 @@ v1_bp.add_resource(CancelledParcels,"/parcels/<int:user_id>/cancelled")
 v1_bp.add_resource(DeliveredParcels,"/parcels/<int:user_id>/delivered")
 
 #Orders routes
+v1_bp.add_resource(Home,"/orders")
 v1_bp.add_resource(AllOrders,"/orders")
 v1_bp.add_resource(MyOrderView, "/order/<int:order_id>")
 v1_bp.add_resource(AdminOrderView, "admin/order/<int:order_id>")
 v1_bp.add_resource(RemoveSubmission, "order/<int:order_id>/unsubmitted")
-v1_bp.add_resource(ProcessOrder, "order/process/<int:order_id>/")
+v1_bp.add_resource(ProcessOrder, "order/process/<int:order_id>")
 v1_bp.add_resource(AllUnprocessedOrders, "orders/unprocessed")
 v1_bp.add_resource(MyUnprocessedOrders, "orders/<int:user_id>/unprocessed")
 

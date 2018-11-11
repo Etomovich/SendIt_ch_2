@@ -80,9 +80,9 @@ class FetchAllUsers(Resource):
                 "Users": page_items,
                 "Total Users": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"http://127.0.0.1:5000/api/v1/users?page="+\
+                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"http://127.0.0.1:5000/api/v1/users?page="+\
+                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)
