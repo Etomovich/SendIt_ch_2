@@ -10,7 +10,7 @@ from courier_app.send_it_apis.v1.views.parcel_views import AllParcels,\
 
 from courier_app.send_it_apis.v1.views.user_order_views import AllOrders,\
     MyOrderView,AdminOrderView, RemoveSubmission, ProcessOrder,\
-    AllUnprocessedOrders,MyProcessedOrders,MyUnprocessedOrders
+    AllUnprocessedOrders,MyProcessedOrders,MyUnprocessedOrders, Home
 
 bp = Blueprint("my_api_v1", __name__)
 
