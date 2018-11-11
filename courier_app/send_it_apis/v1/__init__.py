@@ -8,6 +8,10 @@ from courier_app.send_it_apis.v1.views.parcel_views import AllParcels,\
     AParcels, UserParcels, CancelParcels, ApprovedParcels,\
     NotStartedParcels,InTransitParcels, CancelledParcels, DeliveredParcels
 
+from courier_app.send_it_apis.v1.views.user_order_views import AllOrders,\
+    MyOrderView,AdminOrderView, RemoveSubmission, ProcessOrder,\
+    AllUnprocessedOrders,MyProcessedOrders,MyUnprocessedOrders
+
 bp = Blueprint("my_api_v1", __name__)
 
 v1_bp = Api(bp)
