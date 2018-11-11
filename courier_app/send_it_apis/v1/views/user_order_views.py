@@ -1,4 +1,4 @@
-from flask import request, make_response, jsonify, redirect
+from flask import request, make_response, jsonify
 from flask_restful import Resource
 from marshmallow import Schema, fields, ValidationError,\
         post_dump,post_load,validates
@@ -18,7 +18,12 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as\
 
 class Home(Resource):
     def get(self):
-        return redirect("https://documenter.getpostman.com/view/5585722/RzZ9GeuW")
+        reply = {
+            "Routes Documentation":
+            "https://documenter.getpostman.com/view/5585722/RzZ9GeuW"}
+        answer = make_response(jsonify(reply),200)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class AllOrders(Resource):
     def get(self):
