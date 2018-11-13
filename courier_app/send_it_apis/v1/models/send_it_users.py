@@ -1,6 +1,6 @@
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import (TimedJSONWebSignatureSerializer as\
+from itsdangerous import (TimedJSONWebSignatureSerializer as
     Serializer, BadSignature, SignatureExpired)
 
 from instance.config import Config

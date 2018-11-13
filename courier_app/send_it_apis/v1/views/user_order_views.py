@@ -1,19 +1,19 @@
 from flask import request, make_response, jsonify
 from flask_restful import Resource
-from marshmallow import Schema, fields, ValidationError,\
-        post_dump,post_load,validates
+from marshmallow import (Schema, fields, ValidationError,
+        post_dump,post_load,validates)
 
 from courier_app.send_it_apis.v1.validators import parcel_orders_validators
-from courier_app.send_it_apis.v1.models import SystemUsers, SendItUserOrders,\
-    SendItParcels
+from courier_app.send_it_apis.v1.models import (SystemUsers, SendItUserOrders,
+    SendItParcels)
 
-from courier_app.send_it_apis.v1.views.user_views import _authenticate_admin,\
-    _authenticate_user
+from courier_app.send_it_apis.v1.views.user_views import (_authenticate_admin,
+    _authenticate_user)
 
 from courier_app.send_it_apis.pagination import Kurasa
 from instance.config import Config
 
-from itsdangerous import (TimedJSONWebSignatureSerializer as\
+from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
 
 class Home(Resource):
@@ -357,7 +357,7 @@ class AllUnprocessedOrders(Resource):
 
 class MyProcessedOrders(Resource):
     def get(self,user_id):
-        auth_user = _authenticate_admin()
+        auth_user = _authenticate_user()
         if not isinstance(auth_user, dict):
             return auth_user
         all_users = SendItUserOrders(auth_user['user_id'])
@@ -390,7 +390,7 @@ class MyProcessedOrders(Resource):
 
 class MyUnprocessedOrders(Resource):
     def get(self,user_id):
-        auth_user = _authenticate_admin()
+        auth_user = _authenticate_user()
         if not isinstance(auth_user, dict):
             return auth_user
         all_users = SendItUserOrders(auth_user['user_id'])

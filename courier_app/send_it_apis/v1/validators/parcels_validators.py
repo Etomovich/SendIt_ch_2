@@ -1,8 +1,8 @@
-from marshmallow import Schema, fields, ValidationError,\
-        post_dump,post_load,validates, validates_schema
+from marshmallow import (Schema, fields, ValidationError,
+        post_dump,post_load,validates, validates_schema)
 
-from courier_app.send_it_apis.v1.models import SendItUserOrders,SendItParcels,\
-        SystemUsers
+from courier_app.send_it_apis.v1.models import (SendItUserOrders,
+        SendItParcels, SystemUsers)
 
 class AddParcelSchema(Schema):
     owner_id = fields.Integer(required=True)

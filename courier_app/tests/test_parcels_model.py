@@ -1,7 +1,7 @@
 import unittest
 from instance.config import Config
-from courier_app.send_it_apis.v1.models import SystemUsers,\
-    SendItParcels, SendItUserOrders
+from courier_app.send_it_apis.v1.models import (SystemUsers,
+    SendItParcels, SendItUserOrders)
 
 class ParcelModelCase(unittest.TestCase):
     def setUp(self):

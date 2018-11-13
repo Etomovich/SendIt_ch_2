@@ -3,9 +3,9 @@ import json
 from datetime import datetime
 from flask import jsonify
 from instance.config import Config
-from courier_app.send_it_apis.v1.models import SystemUsers,\
-    SendItParcels, SendItUserOrders
-from itsdangerous import (TimedJSONWebSignatureSerializer\
+from courier_app.send_it_apis.v1.models import (SystemUsers,
+    SendItParcels, SendItUserOrders)
+from itsdangerous import (TimedJSONWebSignatureSerializer
      as Serializer, BadSignature, SignatureExpired)
 from courier_app import create_app
 

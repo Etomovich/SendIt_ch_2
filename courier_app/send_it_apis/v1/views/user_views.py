@@ -9,7 +9,7 @@ from courier_app.send_it_apis.v1.models import SystemUsers
 from courier_app.send_it_apis.pagination import Kurasa
 from instance.config import Config
 
-from itsdangerous import (TimedJSONWebSignatureSerializer as\
+from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
 
 class CreateUser(Resource):
@@ -143,10 +143,14 @@ class TheUser(Resource):
                     "role" in result.data else None
             }
             edit_users = SystemUsers(auth_user['user_id'])
-            reply = edit_users.edit_user(user_id = this_data['user_id'],\
-            username=this_data['username'],email=this_data['email'],\
-            phone_no=this_data['phone_no'],password=this_data['password'],\
-            role=this_data['role'])
+            reply = edit_users.edit_user(
+                user_id = this_data['user_id'],
+                username=this_data['username'],
+                email=this_data['email'],
+                phone_no=this_data['phone_no'],
+                password=this_data['password'],
+                role=this_data['role']
+            )
 
             if reply == True:
                 pack = {"Status":"OK","Message":"User updated successfullly!!"}

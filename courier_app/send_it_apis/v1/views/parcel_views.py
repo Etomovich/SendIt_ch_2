@@ -1,19 +1,19 @@
 from flask import request, make_response, jsonify
 from flask_restful import Resource
-from marshmallow import Schema, fields, ValidationError,\
-        post_dump,post_load,validates
+from marshmallow import (Schema, fields, ValidationError,
+        post_dump,post_load,validates)
 
 from courier_app.send_it_apis.v1.validators import parcels_validators
-from courier_app.send_it_apis.v1.models import SystemUsers, SendItUserOrders,\
-    SendItParcels
+from courier_app.send_it_apis.v1.models import (SystemUsers, 
+    SendItUserOrders, SendItParcels)
 
-from courier_app.send_it_apis.v1.views.user_views import _authenticate_admin,\
-    _authenticate_user
+from courier_app.send_it_apis.v1.views.user_views import (_authenticate_admin,
+    _authenticate_user)
 
 from courier_app.send_it_apis.pagination import Kurasa
 from instance.config import Config
 
-from itsdangerous import (TimedJSONWebSignatureSerializer as\
+from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
 
 class AllParcels(Resource):
@@ -270,6 +270,7 @@ class ApprovedParcels(Resource):
             answer.content_type='application/json;charset=utf-8'
             return answer
 
+#
 class CancelParcels(Resource):
     def put(self, parcel_id):
         auth_user = _authenticate_user()
