@@ -64,11 +64,10 @@ class AllParcels(Resource):
                 answer = make_response(jsonify(pack),201)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
-            answer.content_type='application/json;charset=utf-8'
-            return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class AParcels(Resource):
 
@@ -90,15 +89,13 @@ class AParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
     def put(self, parcel_id):
         auth_user = _authenticate_admin()
@@ -153,15 +150,13 @@ class AParcels(Resource):
                 answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                answer = make_response(jsonify(reply),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(reply),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
     def delete(self, parcel_id):
         auth_user = _authenticate_admin()
@@ -180,11 +175,10 @@ class AParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
-            answer.content_type='application/json;charset=utf-8'
-            return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class UserParcels(Resource):
     def get(self, user_id):
@@ -218,15 +212,13 @@ class UserParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer 
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class ApprovedParcels(Resource):
     def get(self, user_id):
@@ -260,15 +252,13 @@ class ApprovedParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer 
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 #
 class CancelParcels(Resource):
@@ -290,15 +280,13 @@ class CancelParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class NotStartedParcels(Resource):
     def get(self, user_id):
@@ -332,15 +320,13 @@ class NotStartedParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer 
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class InTransitParcels(Resource):
     def get(self, user_id):
@@ -374,15 +360,13 @@ class InTransitParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer 
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class CancelledParcels(Resource):
     def get(self, user_id):
@@ -416,15 +400,13 @@ class CancelledParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer 
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class DeliveredParcels(Resource):
     def get(self, user_id):
@@ -458,12 +440,10 @@ class DeliveredParcels(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer 
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer

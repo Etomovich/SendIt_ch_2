@@ -58,12 +58,9 @@ class SystemUsers(object):
                         SystemUsers.send_it_users[str(user_id)]["role"] = role
                     else:
                         return "UNAUTHORIZED<Field:'role'>"
-                
                 return True
-            else:
-                return "UNAUTHORIZED"
-        else:
             return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
                    
     def  get_a_user(self, userid):
         '''This method returns a single user. It is only visible to Admin 
@@ -76,10 +73,8 @@ class SystemUsers(object):
                     my_user = SystemUsers.send_it_users[str(userid)]
                     my_user["user_id"] = str(userid)
                     return my_user
-                else:
-                    return "UNAUTHORIZED"
-            else:
-                return "UNKNOWN_USER"
+                return "UNAUTHORIZED"
+            return "UNKNOWN_USER"
         except:
             return "UNKNOWN_USER"
 
@@ -91,8 +86,7 @@ class SystemUsers(object):
                 this_user["role"] == "Admin":
                 del SystemUsers.send_it_users[str(userid)]
                 return True
-            else:
-                return "UNAUTHORIZED"
+            return "UNAUTHORIZED"
         return "UNAUTHORIZED"
 
     def login_user(self, password, my_name):
@@ -110,7 +104,6 @@ class SystemUsers(object):
                     return token
                 else:
                     return False
-
         return False
 
     def get_all_users(self):
@@ -122,7 +115,6 @@ class SystemUsers(object):
                 user["user_id"] = thing
                 reply.append(user)
             return reply
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
 
 

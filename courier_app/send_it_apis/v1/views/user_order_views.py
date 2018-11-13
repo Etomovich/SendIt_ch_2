@@ -20,7 +20,8 @@ class Home(Resource):
     def get(self):
         reply = {
             "Routes Documentation":
-            "https://documenter.getpostman.com/view/5585722/RzZ9GeuW"}
+            "https://documenter.getpostman.com/view/5585722/RzZ9GeuW"
+            }
         answer = make_response(jsonify(reply),200)
         answer.content_type='application/json;charset=utf-8'
         return answer
@@ -87,17 +88,14 @@ class AllOrders(Resource):
                 answer = make_response(jsonify(pack),201)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                pack = {"Status":"Unauthorized","Message":reply}
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            pack = {"Status":"Unauthorized","Message":reply}
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class MyOrderView(Resource):
     def get(self, order_id):
@@ -118,15 +116,13 @@ class MyOrderView(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
     def put(self, order_id):
         auth_user = _authenticate_user()
@@ -172,17 +168,14 @@ class MyOrderView(Resource):
                 answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                pack = {"Status":"Unauthorized","Message":reply}
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            pack = {"Status":"Unauthorized","Message":reply}
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
     
     def delete(self, order_id):
         auth_user = _authenticate_user()
@@ -201,15 +194,13 @@ class MyOrderView(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class AdminOrderView(Resource):
     def get(self, order_id):
@@ -230,11 +221,10 @@ class AdminOrderView(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
-            answer.content_type='application/json;charset=utf-8'
-            return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
     def delete(self, order_id):
         auth_user = _authenticate_admin()
@@ -253,11 +243,10 @@ class AdminOrderView(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
-            answer.content_type='application/json;charset=utf-8'
-            return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class RemoveSubmission(Resource):
     def put(self, order_id):
@@ -278,17 +267,14 @@ class RemoveSubmission(Resource):
                 answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                pack = {"Status":"Unauthorized","Message":reply}
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            pack = {"Status":"Unauthorized","Message":reply}
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
     
 class ProcessOrder(Resource):
     def put(self, order_id):
@@ -312,17 +298,14 @@ class ProcessOrder(Resource):
                 answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                pack = {"Status":"Unauthorized","Message":reply}
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            pack = {"Status":"Unauthorized","Message":reply}
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
     
 class AllUnprocessedOrders(Resource):
     def get(self):
@@ -350,10 +333,9 @@ class AllUnprocessedOrders(Resource):
             answer = make_response(jsonify(reply),200)
             answer.content_type='application/json;charset=utf-8'
             return answer 
-        else:
-            answer = make_response(jsonify(pack),401)
-            answer.content_type='application/json;charset=utf-8'
-            return answer
+        answer = make_response(jsonify(pack),401)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class MyProcessedOrders(Resource):
     def get(self,user_id):
@@ -383,10 +365,9 @@ class MyProcessedOrders(Resource):
             answer = make_response(jsonify(reply),200)
             answer.content_type='application/json;charset=utf-8'
             return answer 
-        else:
-            answer = make_response(jsonify(pack),401)
-            answer.content_type='application/json;charset=utf-8'
-            return answer
+        answer = make_response(jsonify(pack),401)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class MyUnprocessedOrders(Resource):
     def get(self,user_id):
@@ -416,7 +397,6 @@ class MyUnprocessedOrders(Resource):
             answer = make_response(jsonify(reply),200)
             answer.content_type='application/json;charset=utf-8'
             return answer 
-        else:
-            answer = make_response(jsonify(pack),401)
-            answer.content_type='application/json;charset=utf-8'
-            return answer
+        answer = make_response(jsonify(pack),401)
+        answer.content_type='application/json;charset=utf-8'
+        return answer

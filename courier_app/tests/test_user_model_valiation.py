@@ -5,8 +5,8 @@ from marshmallow import (Schema, fields, ValidationError,
 from courier_app.send_it_apis.v1.models import (SystemUsers,
     SendItParcels, SendItUserOrders)
 
-from courier_app.send_it_apis.v1.validators.user_model_validators 
-    import (CreateUserSchema,EditUserSchema, UserIdSchema)
+from courier_app.send_it_apis.v1.validators.user_model_validators import (
+    CreateUserSchema,EditUserSchema, UserIdSchema)
 
 class UserValidatorsCase(unittest.TestCase):
 

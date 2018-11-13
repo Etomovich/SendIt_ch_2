@@ -44,8 +44,7 @@ class SendItUserOrders(object):
             SendItUserOrders.sendit_user_orders[this_user["user_id"]]\
             .append(payload)
             return payload            
-        else:
-            return "UNKNOWN_USER"
+        return "UNKNOWN_USER"
 
     #
     def edit_order_user(self,order_id,parcel_id=None,parcel_description=None,\
@@ -136,13 +135,9 @@ class SendItUserOrders(object):
                             ['status'] = 'not_started'
                         SendItParcels.sendit_parcels[thing['parcel_id']]\
                             ['approved'] = 'Yes'
-                        
                     return "DONE"
-                    
-
             return "ORDER_NOT_FOUND"
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
 
     def return_all_orders(self):
         '''This is an admin method to return all orders in the system.'''
@@ -152,8 +147,7 @@ class SendItUserOrders(object):
             for item in SendItUserOrders.sendit_user_orders.keys():
                 orders_for_item = SendItUserOrders.sendit_user_orders[item] 
                 reply = reply + orders_for_item
-            return reply
-        
+            return reply        
         return "UNAUTHORIZED"
     
     def return_all_unprocessed_orders(self):
@@ -169,8 +163,7 @@ class SendItUserOrders(object):
                     if thing['order_status'] == "unprocessed":
                         un_p.append(thing)
                 reply = reply + un_p
-            return reply
-        
+            return reply        
         return "UNAUTHORIZED"
 
     def return_an_order(self, order_id):
