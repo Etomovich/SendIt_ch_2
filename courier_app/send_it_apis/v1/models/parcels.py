@@ -44,8 +44,7 @@ class SendItParcels(object):
             }            
             SendItParcels.sendit_parcels[str(new_id)] = payload
             return True            
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
 
     def edit_parcel(self,parcel_id,weight=None,destination=None,\
         expected_pay=None,submission_station=None,feedback=None,\
@@ -86,8 +85,7 @@ class SendItParcels(object):
                 ['status'] = str(status)
 
             return True
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
 
     def user_cancels_delivery(self, parcel_id):
         '''This method implements a user cancelling a delivery. It is 
@@ -111,8 +109,7 @@ class SendItParcels(object):
                 payload["parcel_id"] = item
                 reply.append(payload)
             return reply
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
 
     def delete_parcel(self, parcel_id):
         '''This method deletes a parcels in the system which makes it an 
@@ -121,8 +118,7 @@ class SendItParcels(object):
         if this_user and this_user['role'] == "Admin":
             del SendItParcels.sendit_parcels[str(parcel_id)]
             return True
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
 
     def get_parcel(self, parcel_id):
         '''This method is only available to the admin and user who delivered
@@ -132,8 +128,7 @@ class SendItParcels(object):
             == "Admin" or this_user['user_id'] == SendItParcels.\
             sendit_parcels[str(parcel_id)]['owner_id']):
             return SendItParcels.sendit_parcels[str(parcel_id)]
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
 
     def get_all_my_parcels(self, user_id):
         '''This method is only available to the admin and user who delivered
@@ -147,8 +142,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                     reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
     
     def get_my_approved_parcels(self,user_id):
         '''This method is only available to the admin and user who delivered
@@ -163,8 +157,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                     reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        else:
-            return "UNAUTHORIZED"
+        return "UNAUTHORIZED"
 
     def get_my_notstarted_parcels(self, user_id):
         '''This method is only available to the admin and user who delivered
@@ -180,8 +173,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                     reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        else:
-            return "UNKNOWN_USER"
+        return "UNKNOWN_USER"
 
     def get_my_intransit_parcels(self, user_id):
         '''This method is only available to the admin and user who delivered
@@ -197,8 +189,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                     reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        else:
-            return "UNKNOWN_USER"
+        return "UNKNOWN_USER"
     
     def get_my_cancelled_parcels(self,user_id):
         '''This method is only available to the admin and user who delivered
@@ -214,8 +205,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                         reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        else:
-            return "UNKNOWN_USER"
+        return "UNKNOWN_USER"
 
     def get_my_delivered_parcels(self, user_id):
         '''This method is only available to the admin and user who delivered
@@ -231,7 +221,6 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                         reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        else:
-            return "UNKNOWN_USER"
+        return "UNKNOWN_USER"
 
 

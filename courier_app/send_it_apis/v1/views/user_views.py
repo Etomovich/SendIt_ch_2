@@ -9,7 +9,7 @@ from courier_app.send_it_apis.v1.models import SystemUsers
 from courier_app.send_it_apis.pagination import Kurasa
 from instance.config import Config
 
-from itsdangerous import (TimedJSONWebSignatureSerializer as\
+from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
 
 class CreateUser(Resource):
@@ -29,11 +29,10 @@ class CreateUser(Resource):
             answer = make_response(jsonify(pack),201)
             answer.content_type='application/json;charset=utf-8'
             return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
-            answer.content_type='application/json;charset=utf-8'
-            return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class UserLogin(Resource):
     def post(self):
@@ -51,16 +50,14 @@ class UserLogin(Resource):
                 answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                pack = {"Status":"Invalid Credentials"}
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            pack = {"Status":"Invalid Credentials"}
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 class FetchAllUsers(Resource):
     def get(self):
@@ -109,15 +106,13 @@ class TheUser(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
     
     def put(self,user_id):
         '''This function edits a user.'''
@@ -143,27 +138,28 @@ class TheUser(Resource):
                     "role" in result.data else None
             }
             edit_users = SystemUsers(auth_user['user_id'])
-            reply = edit_users.edit_user(user_id = this_data['user_id'],\
-            username=this_data['username'],email=this_data['email'],\
-            phone_no=this_data['phone_no'],password=this_data['password'],\
-            role=this_data['role'])
+            reply = edit_users.edit_user(
+                user_id = this_data['user_id'],
+                username=this_data['username'],
+                email=this_data['email'],
+                phone_no=this_data['phone_no'],
+                password=this_data['password'],
+                role=this_data['role']
+            )
 
             if reply == True:
                 pack = {"Status":"OK","Message":"User updated successfullly!!"}
                 answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                pack = {"Status":"Unauthorized","Message":reply}
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            pack = {"Status":"Unauthorized","Message":reply}
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
     def delete(self,user_id):
         '''This function deletes a user.'''
@@ -183,15 +179,13 @@ class TheUser(Resource):
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            else:
-                answer = make_response(jsonify(pack),401)
-                answer.content_type='application/json;charset=utf-8'
-                return answer
-        else:
-            pack = {"Status":"Bad Request","Errors":result.errors}
-            answer = make_response(jsonify(pack),400)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
+        pack = {"Status":"Bad Request","Errors":result.errors}
+        answer = make_response(jsonify(pack),400)
+        answer.content_type='application/json;charset=utf-8'
+        return answer
 
 def _authenticate_admin():
     current_user = ""

@@ -1,7 +1,8 @@
-from marshmallow import Schema, fields, ValidationError,\
-        post_dump,post_load,validates, validates_schema
+from marshmallow import (Schema, fields, ValidationError,
+        post_dump,post_load,validates, validates_schema)
 
-from courier_app.send_it_apis.v1.models import SendItUserOrders,SendItParcels
+from courier_app.send_it_apis.v1.models import (SendItUserOrders,
+SendItParcels)
 
 class AddOrderSchema(Schema):
     parcel_id = fields.Integer(required=True)

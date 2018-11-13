@@ -1,16 +1,16 @@
 from flask import Blueprint
 from flask_restful import Resource, Api
 
-from courier_app.send_it_apis.v1.views.user_views import CreateUser,\
-    UserLogin, FetchAllUsers, TheUser
+from courier_app.send_it_apis.v1.views.user_views import (CreateUser,
+    UserLogin, FetchAllUsers, TheUser)
 
-from courier_app.send_it_apis.v1.views.parcel_views import AllParcels,\
-    AParcels, UserParcels, CancelParcels, ApprovedParcels,\
-    NotStartedParcels,InTransitParcels, CancelledParcels, DeliveredParcels
+from courier_app.send_it_apis.v1.views.parcel_views import (AllParcels,
+    AParcels, UserParcels, CancelParcels, ApprovedParcels,
+    NotStartedParcels,InTransitParcels, CancelledParcels, DeliveredParcels)
 
-from courier_app.send_it_apis.v1.views.user_order_views import AllOrders,\
-    MyOrderView,AdminOrderView, RemoveSubmission, ProcessOrder,\
-    AllUnprocessedOrders,MyProcessedOrders,MyUnprocessedOrders, Home
+from courier_app.send_it_apis.v1.views.user_order_views import (AllOrders,
+    MyOrderView,AdminOrderView, RemoveSubmission, ProcessOrder,
+    AllUnprocessedOrders,MyProcessedOrders,MyUnprocessedOrders, Home)
 
 bp = Blueprint("my_api_v1", __name__)
 
@@ -34,7 +34,7 @@ v1_bp.add_resource(CancelledParcels,"/parcels/<int:user_id>/cancelled")
 v1_bp.add_resource(DeliveredParcels,"/parcels/<int:user_id>/delivered")
 
 #Orders routes
-v1_bp.add_resource(Home,"/")
+v1_bp.add_resource(Home,"/documentation")
 v1_bp.add_resource(AllOrders,"/orders")
 v1_bp.add_resource(MyOrderView, "/order/<int:order_id>")
 v1_bp.add_resource(AdminOrderView, "admin/order/<int:order_id>")
@@ -42,6 +42,7 @@ v1_bp.add_resource(RemoveSubmission, "order/<int:order_id>/unsubmitted")
 v1_bp.add_resource(ProcessOrder, "order/process/<int:order_id>")
 v1_bp.add_resource(AllUnprocessedOrders, "orders/unprocessed")
 v1_bp.add_resource(MyUnprocessedOrders, "orders/<int:user_id>/unprocessed")
+v1_bp.add_resource(MyProcessedOrders, "orders/<int:user_id>/processed")
 
 
 from courier_app.send_it_apis.v1.models.send_it_users import SystemUsers
