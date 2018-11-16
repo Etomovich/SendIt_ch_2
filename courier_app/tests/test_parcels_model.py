@@ -56,7 +56,6 @@ class ParcelModelCase(unittest.TestCase):
         self.assertTrue(reply,
             msg="User exist, expects True")
 
-
     def tearDown(self):
         SystemUsers.send_it_users = {}
         SendItParcels.sendit_parcels ={}
@@ -65,13 +64,13 @@ class ParcelModelCase(unittest.TestCase):
     def test_add_false_parcels(self):
         admin_ob = SendItParcels(self.etomovich_id)
         user_ob = SendItParcels(self.pogie_id)
-        false_user = SendItParcels(00000)
+        false_user = SendItParcels(00000) 
 
         reply = user_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
         
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Add parcels function not working")
 
     def test_add_parcels(self):
@@ -80,10 +79,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
         
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
     def test_edit_parcel(self):
@@ -92,10 +91,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -108,7 +107,7 @@ class ParcelModelCase(unittest.TestCase):
         reply = user_ob.edit_parcel(parcel_id,
             feedback = "Yesu ni Bwana!")
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Add parcels function not working")
 
         reply = admin_ob.edit_parcel(parcel_id,
@@ -123,7 +122,7 @@ class ParcelModelCase(unittest.TestCase):
             status="in_transit",
             approved = "Yes")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"EDITED",
             msg="Add parcels function not working")
 
     def test_cancel_parcel_delivery(self):
@@ -132,10 +131,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -145,13 +144,12 @@ class ParcelModelCase(unittest.TestCase):
                 parcel_id = item
 
         reply = admin_ob.user_cancels_delivery(parcel_id)
-
-        self.assertEqual(reply,"UNAUTHORIZED",
+        
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="User cancel delivery function not working")
 
         reply = user_ob.user_cancels_delivery(parcel_id)
-
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"cancelled",
             msg="User cancel delivery function not working")
 
     def test_get_all_parcels(self):
@@ -160,10 +158,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -179,7 +177,7 @@ class ParcelModelCase(unittest.TestCase):
 
         reply = user_ob.get_all_parcels()
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Check Get All Parcels function works")
 
     def test_delete_parcels(self):
@@ -188,10 +186,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -202,12 +200,12 @@ class ParcelModelCase(unittest.TestCase):
 
         reply = user_ob.delete_parcel(parcel_id)
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Check delete Parcels function works")
 
         reply = admin_ob.delete_parcel(parcel_id)
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"deleted",
             msg="Check delete Parcels function works")
 
     def test_get_a_parcel(self):
@@ -216,10 +214,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -235,7 +233,7 @@ class ParcelModelCase(unittest.TestCase):
 
         reply = false_user.get_parcel(parcel_id)
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Fetching a parcel function not working")
 
     def test_get_all_my_parcels(self):
@@ -244,10 +242,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -268,7 +266,7 @@ class ParcelModelCase(unittest.TestCase):
 
         reply = false_user.get_all_my_parcels(self.pogie_id)
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Fetching a parcel function not working")        
     
     def test_get_my_approved_parcels(self):
@@ -277,10 +275,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -301,7 +299,7 @@ class ParcelModelCase(unittest.TestCase):
 
         reply = false_user.get_my_approved_parcels(self.pogie_id)
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Fetching a parcel function not working")
 
     def test_get_my_notstarted_parcels(self):
@@ -310,10 +308,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -334,7 +332,7 @@ class ParcelModelCase(unittest.TestCase):
 
         reply = false_user.get_my_notstarted_parcels(self.pogie_id)
 
-        self.assertEqual(reply,"UNKNOWN_USER",
+        self.assertEqual(reply["message"],"UNKNOWN USER",
             msg="Fetching a parcel function not working")
 
     def test_get_my_intransit_parcels(self):
@@ -343,10 +341,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -366,8 +364,7 @@ class ParcelModelCase(unittest.TestCase):
             msg="Fetching a parcel function not working")
 
         reply = false_user.get_my_intransit_parcels(self.pogie_id)
-
-        self.assertEqual(reply,"UNKNOWN_USER",
+        self.assertEqual(reply["message"],"UNKNOWN USER",
             msg="Fetching a parcel function not working")
 
     def test_get_my_cancelled_parcels(self):
@@ -376,10 +373,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"], "CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -400,7 +397,7 @@ class ParcelModelCase(unittest.TestCase):
 
         reply = false_user.get_my_cancelled_parcels(self.pogie_id)
 
-        self.assertEqual(reply,"UNKNOWN_USER",
+        self.assertEqual(reply["message"],"UNKNOWN USER",
             msg="Fetching a parcel function not working")
 
     def test_get_my_delivered_parcels(self):
@@ -409,10 +406,10 @@ class ParcelModelCase(unittest.TestCase):
         false_user = SendItParcels(00000)
 
         reply = admin_ob.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -433,9 +430,7 @@ class ParcelModelCase(unittest.TestCase):
 
         reply = false_user.get_my_delivered_parcels(self.pogie_id)
 
-        self.assertEqual(reply,"UNKNOWN_USER",
+        self.assertEqual(reply["message"],"UNKNOWN USER",
             msg="Fetching a parcel function not working")
-
-
-    
+   
 

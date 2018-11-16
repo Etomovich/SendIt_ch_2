@@ -1,3 +1,4 @@
+import os
 from flask import request, make_response, jsonify
 from flask_restful import Resource
 from marshmallow import (Schema, fields, ValidationError,
@@ -15,6 +16,8 @@ from instance.config import Config
 
 from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
+
+BASE_URL = os.getenv('PAGINATE_BASE_URL')
 
 class AllParcels(Resource):
     def get(self):
@@ -34,9 +37,9 @@ class AllParcels(Resource):
                 "All Parcels": page_items,
                 "Total Parcels": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels?page="+\
+                "Next Page":BASE_URL+"/api/v1/parcels?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels?page="+\
+                "Prev Page":BASE_URL+"/api/v1/parcels?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)
@@ -51,19 +54,22 @@ class AllParcels(Resource):
         schema = parcels_validators.AddParcelSchema()
         result = schema.load(user_inp)
         if len(result.errors) < 1:
-            
             create_parcel = SendItParcels(auth_user['user_id'])
             reply = create_parcel.add_parcel(
                 owner_id = result.data['owner_id'],\
+                parcel_name= result.data['parcel_name'],
                 weight = result.data['weight'],\
                 submission_station = result.data['submission_station'],\
                 present_location = result.data['present_location'])
 
-            if reply:
-                pack = {"Status":"OK","Message":"Created Sucessfully"}
-                answer = make_response(jsonify(pack),201)
+            if reply["message"] == "CREATED":
+                reply["Status"] = "OK"
+                answer = make_response(jsonify(reply),201)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
+            answer = make_response(jsonify(reply),401)
+            answer.content_type='application/json;charset=utf-8'
+            return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
         answer = make_response(jsonify(pack),400)
         answer.content_type='application/json;charset=utf-8'
@@ -81,12 +87,9 @@ class AParcels(Resource):
         if len(result.errors) < 1:
             all_parcels = SendItParcels(auth_user['user_id'])
             pack = all_parcels.get_parcel(str(parcel_id))
-            if (isinstance(pack, dict)):
-                reply = {
-                    "Status":"OK",
-                    "Parcel": pack
-                }
-                answer = make_response(jsonify(reply),200)
+            if (pack['message'] ==  "FOUND"):
+                pack["Status"] = "OK"
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
             answer = make_response(jsonify(pack),401)
@@ -145,9 +148,9 @@ class AParcels(Resource):
                 status = this_data['status'],
                 approved = this_data['approved'])
 
-            if reply == True :
-                pack = {"Status":"Edited successfully"}
-                answer = make_response(jsonify(pack),200)
+            if reply["message"] == 'EDITED':
+                reply["Status"] = "OK"
+                answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
             answer = make_response(jsonify(reply),401)
@@ -168,11 +171,8 @@ class AParcels(Resource):
         if len(result.errors) < 1:
             delete_order = SendItParcels(auth_user['user_id'])
             pack = delete_order.delete_parcel(str(parcel_id))
-            if pack:
-                reply = {
-                    "Status":"Deleted"
-                }
-                answer = make_response(jsonify(reply),200)
+            if pack["message"] == "deleted":
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
@@ -202,10 +202,10 @@ class UserParcels(Resource):
                     "Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/users/"\
+                    "Next Page":BASE_URL+"/api/v1/users/"\
                         +str(user_id)+"/parcels?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/users/"\
+                    "Prev Page":BASE_URL+"/api/v1/users/"\
                         +str(user_id)+"/parcels?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -242,10 +242,10 @@ class ApprovedParcels(Resource):
                     "Approved Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/approved?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/approved?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -273,11 +273,8 @@ class CancelParcels(Resource):
         if len(result.errors) < 1:
             cancel_parcel = SendItParcels(auth_user['user_id'])
             pack = cancel_parcel.user_cancels_delivery(str(parcel_id))
-            if pack:
-                reply = {
-                    "Status":"Cancelled"
-                }
-                answer = make_response(jsonify(reply),200)
+            if pack["message"] == "cancelled":            
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
             answer = make_response(jsonify(pack),401)
@@ -310,10 +307,10 @@ class NotStartedParcels(Resource):
                     "Not Started Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/not-started?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/not-started?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -350,10 +347,10 @@ class InTransitParcels(Resource):
                     "Intransit Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/in-transit?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/in-transit?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -390,10 +387,10 @@ class CancelledParcels(Resource):
                     "Cancelled Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/cancelled?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/cancelled?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -430,10 +427,10 @@ class DeliveredParcels(Resource):
                     "Delivered Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/delivered?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/delivered?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }

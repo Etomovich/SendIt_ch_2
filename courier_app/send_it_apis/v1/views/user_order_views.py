@@ -1,3 +1,4 @@
+import os
 from flask import request, make_response, jsonify
 from flask_restful import Resource
 from marshmallow import (Schema, fields, ValidationError,
@@ -15,6 +16,8 @@ from instance.config import Config
 
 from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
+
+BASE_URL = os.getenv('PAGINATE_BASE_URL') 
 
 class Home(Resource):
     def get(self):
@@ -44,9 +47,9 @@ class AllOrders(Resource):
                 "Orders": page_items,
                 "Total Orders": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
+                "Next Page":BASE_URL+"/api/v1/users?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
+                "Prev Page":BASE_URL+"/api/v1/users?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)
@@ -83,13 +86,12 @@ class AllOrders(Resource):
                 amount_paid=this_data['amount_paid'],\
                 destination=this_data['destination'])
 
-            if isinstance(reply, dict):
-                pack = {"Status":"OK","Order":reply}
-                answer = make_response(jsonify(pack),201)
+            if reply["message"] == "CREATED":
+                reply["Status"] = "OK"
+                answer = make_response(jsonify(reply),201)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            pack = {"Status":"Unauthorized","Message":reply}
-            answer = make_response(jsonify(pack),401)
+            answer = make_response(jsonify(reply),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
@@ -108,15 +110,12 @@ class MyOrderView(Resource):
         if len(result.errors) < 1:
             this_user = SendItUserOrders(auth_user['user_id'])
             pack = this_user.return_my_order(str(order_id))
-            if (isinstance(pack, dict)):
-                reply = {
-                    "Status":"OK",
-                    "User": pack
-                }
-                answer = make_response(jsonify(reply),200)
+            if (pack['message'] ==  "FOUND"):
+                pack["Status"] = "OK"
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            answer = make_response(jsonify(pack),401)
+            answer = make_response(jsonify(pack),404)
             answer.content_type='application/json;charset=utf-8'
             return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
@@ -163,13 +162,12 @@ class MyOrderView(Resource):
                 destination=this_data['destination'],\
                 submitted=this_data['submitted'])
 
-            if reply == 'EDITED':
-                pack = {"Status":"Edited successfully"}
-                answer = make_response(jsonify(pack),200)
+            if reply["message"] == 'EDITED':
+                reply["Status"] = "OK"
+                answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            pack = {"Status":"Unauthorized","Message":reply}
-            answer = make_response(jsonify(pack),401)
+            answer = make_response(jsonify(reply),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
@@ -187,14 +185,11 @@ class MyOrderView(Resource):
         if len(result.errors) < 1:
             delete_order = SendItUserOrders(auth_user['user_id'])
             pack = delete_order.user_order_deletion(str(order_id))
-            if pack == "DELETED":
-                reply = {
-                    "Status":"Deleted"
-                }
-                answer = make_response(jsonify(reply),200)
+            if pack["message"] == "DELETED":
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            answer = make_response(jsonify(pack),401)
+            answer = make_response(jsonify(pack),404)
             answer.content_type='application/json;charset=utf-8'
             return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
@@ -213,14 +208,14 @@ class AdminOrderView(Resource):
         if len(result.errors) < 1:
             this_user = SendItUserOrders(auth_user['user_id'])
             pack = this_user.return_an_order(str(order_id))
-            if (isinstance(pack, dict)):
-                reply = {
-                    "Status":"OK",
-                    "User": pack
-                }
-                answer = make_response(jsonify(reply),200)
+            if (pack['message'] ==  "FOUND"):
+                pack["Status"] = "OK"
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
+            answer = make_response(jsonify(pack),401)
+            answer.content_type='application/json;charset=utf-8'
+            return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
         answer = make_response(jsonify(pack),400)
         answer.content_type='application/json;charset=utf-8'
@@ -236,13 +231,13 @@ class AdminOrderView(Resource):
         if len(result.errors) < 1:
             delete_order = SendItUserOrders(auth_user['user_id'])
             pack = delete_order.admin_order_deletion(str(order_id))
-            if pack == "DELETED":
-                reply = {
-                    "Status":"Deleted"
-                }
-                answer = make_response(jsonify(reply),200)
+            if pack["message"] == "DELETED":
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
+            answer = make_response(jsonify(pack),401)
+            answer.content_type='application/json;charset=utf-8'
+            return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
         answer = make_response(jsonify(pack),400)
         answer.content_type='application/json;charset=utf-8'
@@ -262,13 +257,11 @@ class RemoveSubmission(Resource):
             reply = remove_sub.remove_submission(
                 order_id = result.data['order_id'])
 
-            if reply == 'DONE':
-                pack = {"Status":"Order submission removed!"}
-                answer = make_response(jsonify(pack),200)
+            if reply["message"] == "Submission Removed":
+                answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            pack = {"Status":"Unauthorized","Message":reply}
-            answer = make_response(jsonify(pack),401)
+            answer = make_response(jsonify(reply),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
@@ -293,9 +286,8 @@ class ProcessOrder(Resource):
                 order_status = result.data['order_status'],\
                 feedback=result.data['feedback'])
 
-            if reply == 'DONE':
-                pack = {"Status":"Order proccessed successfully."}
-                answer = make_response(jsonify(pack),200)
+            if reply["message"] == "Submission Removed":
+                answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
             pack = {"Status":"Unauthorized","Message":reply}
@@ -325,9 +317,9 @@ class AllUnprocessedOrders(Resource):
                 "Orders": page_items,
                 "Total Orders": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/unprocessed?page="+\
+                "Next Page":BASE_URL+"/api/v1/orders/unprocessed?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/unprocessed?page="+\
+                "Prev Page":BASE_URL+"/api/v1/orders/unprocessed?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)
@@ -355,10 +347,10 @@ class MyProcessedOrders(Resource):
                 "Orders": page_items,
                 "Total Orders": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/"\
+                "Next Page":BASE_URL+"/api/v1/orders/"\
                     +str(user_id)+"/processed?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/"\
+                "Prev Page":BASE_URL+"/api/v1/orders/"\
                     +str(user_id)+"/processed?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
@@ -387,10 +379,10 @@ class MyUnprocessedOrders(Resource):
                 "Orders": page_items,
                 "Total Orders": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/"\
+                "Next Page":BASE_URL+"/api/v1/orders/"\
                     +str(user_id)+"/unprocessed?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/"\
+                "Prev Page":BASE_URL+"/api/v1/orders/"\
                     +str(user_id)+"/unprocessed?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }

@@ -20,7 +20,7 @@ v1_bp = Api(bp)
 v1_bp.add_resource(CreateUser,"/register")
 v1_bp.add_resource(UserLogin,"/login")
 v1_bp.add_resource(FetchAllUsers,"/users")
-v1_bp.add_resource(TheUser,"/user/<int:user_id>")
+v1_bp.add_resource(TheUser,"/user/<int:user_id>") 
 
 #Parcel routes
 v1_bp.add_resource(AllParcels,"/parcels")
@@ -37,12 +37,12 @@ v1_bp.add_resource(DeliveredParcels,"/parcels/<int:user_id>/delivered")
 v1_bp.add_resource(Home,"/documentation")
 v1_bp.add_resource(AllOrders,"/orders")
 v1_bp.add_resource(MyOrderView, "/order/<int:order_id>")
-v1_bp.add_resource(AdminOrderView, "admin/order/<int:order_id>")
-v1_bp.add_resource(RemoveSubmission, "order/<int:order_id>/unsubmitted")
-v1_bp.add_resource(ProcessOrder, "order/process/<int:order_id>")
-v1_bp.add_resource(AllUnprocessedOrders, "orders/unprocessed")
-v1_bp.add_resource(MyUnprocessedOrders, "orders/<int:user_id>/unprocessed")
-v1_bp.add_resource(MyProcessedOrders, "orders/<int:user_id>/processed")
+v1_bp.add_resource(AdminOrderView, "/admin/order/<int:order_id>")
+v1_bp.add_resource(RemoveSubmission, "/order/<int:order_id>/unsubmitted")
+v1_bp.add_resource(ProcessOrder, "/order/process/<int:order_id>")
+v1_bp.add_resource(AllUnprocessedOrders, "/orders/unprocessed")
+v1_bp.add_resource(MyUnprocessedOrders, "/orders/<int:user_id>/unprocessed")
+v1_bp.add_resource(MyProcessedOrders, "/orders/<int:user_id>/processed")
 
 
 from courier_app.send_it_apis.v1.models.send_it_users import SystemUsers

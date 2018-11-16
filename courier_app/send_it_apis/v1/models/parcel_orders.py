@@ -2,7 +2,7 @@ import uuid
 
 class SendItUserOrders(object):
     '''This class implements storage of System user orders'''    
-    sendit_user_orders = {}
+    sendit_user_orders = {} 
 
     def __init__(self, current_user_id):
         self.current_user_id = str(int(current_user_id))
@@ -18,7 +18,7 @@ class SendItUserOrders(object):
             return False
 
     #
-    def add_order(self,parcel_id,parcel_description=None,pay_mode=None,\
+    def add_order(self,parcel_id,parcel_description=None,pay_mode=None,
                             pay_proof=None,amount_paid=None,destination=None):
         '''This method allows a user to make an order. '''        
         this_user = self._user_is_there()
@@ -43,13 +43,15 @@ class SendItUserOrders(object):
             }            
             SendItUserOrders.sendit_user_orders[this_user["user_id"]]\
             .append(payload)
-            return payload            
-        return "UNKNOWN_USER"
+            reply = payload 
+            reply["message"] = "CREATED"
+            return reply           
+        return {"message":"UNKNOWN USER"}
 
     #
-    def edit_order_user(self,order_id,parcel_id=None,parcel_description=None,\
-        pay_mode=None,pay_proof=None,amount_paid=None,destination=None,\
-        submitted=False):
+    def edit_order_user(self,order_id,parcel_id=None,parcel_description=None,
+            pay_mode=None,pay_proof=None,amount_paid=None,destination=None,
+            submitted=False):
         '''This method allows the owner of <order_id> to edit the order's details.
         NB: If the order is accepted you cannot edit.'''
         this_user = self._user_is_there()
@@ -63,7 +65,7 @@ class SendItUserOrders(object):
                         item['order_status'] == 'rejected'):
                         
                     if item['order_status'] == 'accepted':
-                        return "PROCESSED"
+                        return {"message":"PROCESSED"}
 
                     if parcel_id:
                         item['parcel_id'] = str(parcel_id)
@@ -85,14 +87,16 @@ class SendItUserOrders(object):
                            (len(item['destination']) != 0):
                             item['submitted'] = str(submitted)
                         else:
-                            return "Fill fields[parcel_description,"+\
+                            return {
+                                "message":"Fill fields[parcel_description,"+\
                                 "pay_mode, pay_proof,amount_paid,"+\
-                                "destination] before submitting."
-                    return "EDITED"
-
-            return "ORDER_NOT_FOUND"           
-        
-        return "UNKNOWN USER"
+                                "destination] before submitting.",
+                                "Submit":"Submission Rejected"}
+                    reply = item
+                    reply["message"] = "EDITED"
+                    return reply
+            return {"message":"ORDER NOT FOUND"}        
+        return {"message":"UNKNOWN USER"}
 
     #
     def remove_submission(self, order_id):
@@ -112,11 +116,12 @@ class SendItUserOrders(object):
 
                     item['submitted'] = "False"
                     item['order_status'] == 'unprocessed'
-                    return "DONE"
+                    reply = item
+                    reply["message"] = "Submission Removed"
+                    return reply
 
-            return "ORDER_NOT_FOUND"
-        
-        return "UNKNOWN_USER"
+            return {"message":"ORDER NOT FOUND"}        
+        return {"message":"UNKNOWN USER"}
     
     def process_order(self,order_id,order_status,feedback):
         '''This method allows the admin to process user order data'''
@@ -135,9 +140,11 @@ class SendItUserOrders(object):
                             ['status'] = 'not_started'
                         SendItParcels.sendit_parcels[thing['parcel_id']]\
                             ['approved'] = 'Yes'
-                    return "DONE"
-            return "ORDER_NOT_FOUND"
-        return "UNAUTHORIZED"
+                    reply = thing
+                    reply["message"] = "PROCESSED"
+                    return reply
+            return {"message":"ORDER NOT FOUND"}
+        return {"message":"UNAUTHORIZED"}
 
     def return_all_orders(self):
         '''This is an admin method to return all orders in the system.'''
@@ -148,7 +155,7 @@ class SendItUserOrders(object):
                 orders_for_item = SendItUserOrders.sendit_user_orders[item] 
                 reply = reply + orders_for_item
             return reply        
-        return "UNAUTHORIZED"
+        return {"message":"UNAUTHORIZED"}
     
     def return_all_unprocessed_orders(self):
         '''This is an admin method to return all 
@@ -164,19 +171,21 @@ class SendItUserOrders(object):
                         un_p.append(thing)
                 reply = reply + un_p
             return reply        
-        return "UNAUTHORIZED"
+        return {"message":"UNAUTHORIZED"}
 
     def return_an_order(self, order_id):
         '''This method is an admin method to fetch a single order'''
         this_user = self._user_is_there()
-        if this_user and this_user["role"] == "Admin":
+        if this_user and (this_user["role"] == "Admin"):
             for item in SendItUserOrders.sendit_user_orders.keys():
                 orders_for_item = SendItUserOrders.sendit_user_orders[item] 
                 for thing in orders_for_item:
                     if thing['order_id'] == str(order_id):
-                        return thing
-            return "ORDER_NOT_FOUND"        
-        return "UNAUTHORIZED"
+                        reply = thing
+                        reply["message"] = "FOUND"
+                        return reply
+            return {"message":"ORDER NOT FOUND"}        
+        return {"message":"UNAUTHORIZED"}
 
     def return_my_order(self, order_id):
         '''This method is a user method to fetch a single order from
@@ -187,9 +196,12 @@ class SendItUserOrders(object):
                             [str(self.current_user_id)] 
             for thing in orders_for_item:
                 if thing['order_id'] == str(order_id):
-                    return thing
-            return "ORDER_NOT_FOUND"
-        return "UNAUTHORIZED"
+                    reply = thing
+                    reply["message"] = "FOUND"
+                    return reply
+            return {"message":"ORDER NOT FOUND"}        
+        return {"message":"UNAUTHORIZED"}
+
 
     #
     def user_order_deletion(self, order_id):
@@ -210,9 +222,9 @@ class SendItUserOrders(object):
                          == str(order_id):
                             SendItParcels.sendit_parcels[item]\
                             ['order_id'] = ""
-                    return "DELETED"
-            return "ORDER_PROCCESSED_OR_NOT_FOUND"
-        return "UNAUTHORIZED"
+                    return {"message":"DELETED"}
+            return {"message":"ORDER PROCCESSED OR NOT FOUND"}
+        return {"message":"UNAUTHORIZED"}
 
     def admin_order_deletion(self, order_id):
         '''This method allows an administrator to delete an order.'''
@@ -224,9 +236,9 @@ class SendItUserOrders(object):
                     if thing['order_id'] == str(order_id):
                         SendItUserOrders.sendit_user_orders[item]\
                         .remove(thing)
-                        return "DELETED"
-            return "ORDER_NOT_FOUND"        
-        return "UNAUTHORIZED"
+                        return {"message":"DELETED"}
+            return {"message":"ORDER NOT FOUND"}        
+        return {"message":"UNAUTHORIZED"}
 
     def my_processed_orders(self,user_id):
         '''This method allows a user to get his/her list of 
@@ -242,7 +254,7 @@ class SendItUserOrders(object):
                 (thing['order_status'] == "rejected"):
                     reply.append(thing)
             return reply
-        return "UNAUTHORIZED"
+        return {"message":"UNAUTHORIZED"}
 
     def my_unprocessed_orders(self, user_id):
         '''This method allows a user to get his/her list of 
@@ -257,6 +269,6 @@ class SendItUserOrders(object):
                 if (thing['order_status'] == "unprocessed"):
                     reply.append(thing)
             return reply
-        return "UNAUTHORIZED"
+        return {"message":"UNAUTHORIZED"}
 
 

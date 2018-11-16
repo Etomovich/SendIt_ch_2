@@ -160,7 +160,7 @@ class OrdersViewCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
-        self.assertEqual(output
+        self.assertEqual(output["message"]
             ,"You are not authorized to view this page!!",
             msg="Create order not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -178,8 +178,6 @@ class OrdersViewCase(unittest.TestCase):
                 content_type='application/json')
         
         output = json.loads(answ.data.decode())
-        self.assertEqual(output['Status'],"OK",
-            msg="Get users not working properly!")
         self.assertEqual(answ.status_code,200,
             msg="Get users not working properly!")
 
@@ -189,7 +187,7 @@ class OrdersViewCase(unittest.TestCase):
 
         output = json.loads(answ.data.decode())
         print(output)
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
             "This is an Admin Page contact admin for more help!!",
             msg="Get users not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -203,4 +201,68 @@ class OrdersViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Get users not working properly!")
 
-    
+    def test_get_my_order(self):
+        answ= self.client.post("/api/v1/orders",
+            data = self.mk_order,
+            headers={'Authorization': self.user_token},
+            content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        answ= self.client.get("/api/v1/order/"+output["order_id"],
+                headers={'Authorization': self.user_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['Status'],"OK",
+            msg="Get orders not working properly!")
+        self.assertEqual(answ.status_code,200,
+            msg="Get orders not working properly!")
+
+        output = json.loads(answ.data.decode())
+        answ= self.client.get("/api/v1/order/"+output["order_id"],
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(answ.status_code,404,
+            msg="Get orders not working properly!")
+
+    def test_delete_my_order(self):
+        answ= self.client.post("/api/v1/orders",
+            data = self.mk_order,
+            headers={'Authorization': self.user_token},
+            content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        the_id = output["order_id"]
+
+        answ= self.client.delete("/api/v1/order/"+the_id,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(answ.status_code,404,
+            msg="Delete orders not working properly!")
+
+        output = json.loads(answ.data.decode())
+        answ= self.client.delete("/api/v1/order/"+the_id,
+                headers={'Authorization': self.user2_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['message'],"ORDER PROCCESSED OR NOT FOUND",
+            msg="Get orders not working properly!")
+        self.assertEqual(answ.status_code,404,
+            msg="Get orders not working properly!")
+
+        output = json.loads(answ.data.decode())
+        answ= self.client.delete("/api/v1/order/"+the_id,
+                headers={'Authorization': self.user_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['message'],"DELETED",
+            msg="Get orders not working properly!")
+        self.assertEqual(answ.status_code,200,
+            msg="Get orders not working properly!")
+

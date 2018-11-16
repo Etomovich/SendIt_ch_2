@@ -25,7 +25,15 @@ class SystemUsers(object):
         new_id = uuid.uuid4().int
         SendItUserOrders.sendit_user_orders[str(new_id)] = []
         SystemUsers.send_it_users[str(new_id)] = payload
-        return True
+        payload['user_id'] = str(new_id)
+        out_data = {
+            "user_id": payload['user_id'],
+            "username": payload['username'],
+            "email": payload['email'],
+            "phone_number": payload['phone_number'],
+            "role": payload['role']
+        }
+        return out_data
 
     def _user_is_there(self):
         try:
@@ -57,10 +65,12 @@ class SystemUsers(object):
                         ["role"] == "Admin":
                         SystemUsers.send_it_users[str(user_id)]["role"] = role
                     else:
-                        return "UNAUTHORIZED<Field:'role'>"
-                return True
-            return "UNAUTHORIZED"
-        return "UNAUTHORIZED"
+                        return {"message":"UNAUTHORIZED<Field:'role'>"}
+                my_user = SystemUsers.send_it_users[str(user_id)]
+                my_user["message"] = "Authorized"
+                return my_user
+            return {"message":"UNAUTHORIZED"}
+        return {"message":"UNAUTHORIZED"}
                    
     def  get_a_user(self, userid):
         '''This method returns a single user. It is only visible to Admin 
@@ -72,11 +82,12 @@ class SystemUsers(object):
                     my_user={}
                     my_user = SystemUsers.send_it_users[str(userid)]
                     my_user["user_id"] = str(userid)
+                    my_user["message"] = "Authorized"
                     return my_user
-                return "UNAUTHORIZED"
-            return "UNKNOWN_USER"
+                return {"message":"UNAUTHORIZED"}
+            return {"message":"UNKNOWN USER"}
         except:
-            return "UNKNOWN_USER"
+            return {"message":"UNKNOWN USER"}
 
     def delete_a_user(self, userid):
         '''This method allows the admin to delete a single user.'''        
@@ -85,9 +96,9 @@ class SystemUsers(object):
             if this_user["user_id"] == str(userid) or \
                 this_user["role"] == "Admin":
                 del SystemUsers.send_it_users[str(userid)]
-                return True
-            return "UNAUTHORIZED"
-        return "UNAUTHORIZED"
+                return {"message":"DELETED"}
+            return {"message":"UNAUTHORIZED"}
+        return {"message":"UNAUTHORIZED"}
 
     def login_user(self, password, my_name):
         '''This method allows the admin to create a user'''
@@ -115,6 +126,6 @@ class SystemUsers(object):
                 user["user_id"] = thing
                 reply.append(user)
             return reply
-        return "UNAUTHORIZED"
+        return {"message":"UNAUTHORIZED"}
 
 

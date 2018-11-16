@@ -1,3 +1,4 @@
+import os
 from flask import request, make_response, jsonify
 from flask_restful import Resource
 from marshmallow import Schema, fields, ValidationError,\
@@ -12,8 +13,9 @@ from instance.config import Config
 from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
 
-class CreateUser(Resource):
+BASE_URL = os.getenv('PAGINATE_BASE_URL') 
 
+class CreateUser(Resource):
     def post(self):
         #Register user
         user_inp = request.get_json() or {}
@@ -77,14 +79,17 @@ class FetchAllUsers(Resource):
                 "Users": page_items,
                 "Total Users": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
+                "Next Page":BASE_URL+"/api/v1/users?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
+                "Prev Page":BASE_URL+"/api/v1/users?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)
             answer.content_type='application/json;charset=utf-8'
-            return answer 
+            return answer
+        answer = make_response(jsonify(pack),401)
+        answer.content_type='application/json;charset=utf-8'
+        return answer 
 
 
 class TheUser(Resource):
@@ -98,7 +103,7 @@ class TheUser(Resource):
         if len(result.errors) < 1:
             this_user = SystemUsers(auth_user['user_id'])
             pack = this_user.get_a_user(str(user_id))
-            if (isinstance(pack, dict)):
+            if (pack['message'] == "Authorized"):
                 reply = {
                     "Status":"OK",
                     "User": pack
@@ -147,12 +152,12 @@ class TheUser(Resource):
                 role=this_data['role']
             )
 
-            if reply == True:
-                pack = {"Status":"OK","Message":"User updated successfullly!!"}
+            if reply['message'] == "Authorized":
+                pack = {"Status":"Success","Message":reply}
                 answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            pack = {"Status":"Unauthorized","Message":reply}
+            pack = {"Status":"Unauthorized"}
             answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
@@ -172,7 +177,7 @@ class TheUser(Resource):
         if len(result.errors) < 1:
             this_user = SystemUsers(auth_user['user_id'])
             pack = this_user.delete_a_user(str(user_id))
-            if pack == True:
+            if pack["message"] == "DELETED":
                 reply = {
                     "Status":"Deleted"
                 }
@@ -195,18 +200,19 @@ def _authenticate_admin():
         data = s.loads(str(token))
         current_user = SystemUsers.send_it_users[data['user_id']]
     except:
-        reply="You are not authorized to view this page!!"
+        reply={"message":"You are not authorized to view this page!!"}
         answer = make_response(jsonify(reply),401)
         answer.content_type='application/json;charset=utf-8'
         return answer
 
     if current_user['role'] == "User":
-        reply="This is an Admin Page contact admin for more help!!"
+        reply={"message":"This is an Admin Page contact admin for more help!!"}
         answer = make_response(jsonify(reply),401)
         answer.content_type='application/json;charset=utf-8'
         return answer
 
     current_user['user_id'] = data['user_id']
+    current_user['message'] = "OK" 
     return current_user
 
 def _authenticate_user():
@@ -217,10 +223,11 @@ def _authenticate_user():
         data = s.loads(str(token))
         current_user = SystemUsers.send_it_users[data['user_id']]
     except:
-        reply="You are not authorized to view this page!!"
+        reply={"message":"You are not authorized to view this page!!"}
         answer = make_response(jsonify(reply),401)
         answer.content_type='application/json;charset=utf-8'
         return answer
 
     current_user['user_id'] = data['user_id']
+    current_user['message'] = "OK" 
     return current_user

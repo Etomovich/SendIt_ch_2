@@ -81,35 +81,35 @@ class UserModelCase(unittest.TestCase):
         user_ob = SystemUsers(pogie_id)
 
         reply = users_DB.edit_user(pogie_id, phone_no="54678")
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Edit User not working")
 
         reply = user_ob.edit_user(etomovich_id, phone_no="54678")
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Edit User not working")
 
         reply = user_ob.edit_user(pogie_id, role="Admin")
-        self.assertEqual(reply,"UNAUTHORIZED<Field:'role'>",
+        self.assertEqual(reply["message"],"UNAUTHORIZED<Field:'role'>",
             msg="Edit User not working")
 
         reply = admin_ob.edit_user(pogie_id, role="Admin")
-        self.assertEqual(reply,True, 
+        self.assertEqual(reply["role"],"Admin", 
             msg="Edit User not working")
 
         reply = admin_ob.edit_user(pogie_id, username="Pogba")
-        self.assertEqual(reply,True, 
-            msg="Edit User not working")
+        self.assertEqual(reply["username"],"Pogba", 
+           msg="Edit User not working")
 
         reply = admin_ob.edit_user(pogie_id, email="pog@g.com")
-        self.assertEqual(reply,True, 
+        self.assertEqual(reply["email"],"pog@g.com", 
             msg="Edit User not working")
 
         reply = admin_ob.edit_user(pogie_id, phone_no="034556")
-        self.assertEqual(reply,True, 
+        self.assertEqual(reply["phone_number"],"034556", 
             msg="Edit User not working")
 
         reply = admin_ob.edit_user(pogie_id, password="pogz")
-        self.assertEqual(reply,True, 
+        self.assertEqual(reply["password"],"pogz", 
             msg="Edit User not working")
 
     def test_get_a_user(self):
@@ -136,11 +136,11 @@ class UserModelCase(unittest.TestCase):
         user_ob = SystemUsers(pogie_id)
 
         reply = users_DB.get_a_user(pogie_id)
-        self.assertEqual(reply,"UNKNOWN_USER",
+        self.assertEqual(reply["message"],"UNKNOWN USER",
             msg="Get User not working")
 
         reply = user_ob.get_a_user(etomovich_id)
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Get User not working")
 
         reply = user_ob.get_a_user(pogie_id)
@@ -148,7 +148,7 @@ class UserModelCase(unittest.TestCase):
             msg="Get User not working")
 
         reply = admin_ob.get_a_user(000000)
-        self.assertEqual(reply,"UNKNOWN_USER", 
+        self.assertEqual(reply["message"],"UNKNOWN USER", 
             msg="Get User not working")
 
     def test_delete_a_user(self):
@@ -175,15 +175,15 @@ class UserModelCase(unittest.TestCase):
         user_ob = SystemUsers(pogie_id)
 
         reply = user_ob.delete_a_user(etomovich_id)
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Delete User not working")
 
         reply = users_DB.delete_a_user(etomovich_id)
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Delete User not working")
 
         reply = user_ob.delete_a_user(pogie_id)
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"DELETED",
             msg="Delete User not working")
 
     def test_login_a_user(self):
@@ -249,7 +249,7 @@ class UserModelCase(unittest.TestCase):
         user_ob = SystemUsers(pogie_id)
 
         reply = user_ob.get_all_users()
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Get all users not working")
 
         reply = admin_ob.get_all_users()
