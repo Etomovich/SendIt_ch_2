@@ -178,8 +178,6 @@ class OrdersViewCase(unittest.TestCase):
                 content_type='application/json')
         
         output = json.loads(answ.data.decode())
-        self.assertEqual(output['Status'],"OK",
-            msg="Get users not working properly!")
         self.assertEqual(answ.status_code,200,
             msg="Get users not working properly!")
 
