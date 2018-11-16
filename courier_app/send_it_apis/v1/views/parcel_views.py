@@ -51,19 +51,22 @@ class AllParcels(Resource):
         schema = parcels_validators.AddParcelSchema()
         result = schema.load(user_inp)
         if len(result.errors) < 1:
-            
             create_parcel = SendItParcels(auth_user['user_id'])
             reply = create_parcel.add_parcel(
                 owner_id = result.data['owner_id'],\
+                parcel_name= result.data['parcel_name'],
                 weight = result.data['weight'],\
                 submission_station = result.data['submission_station'],\
                 present_location = result.data['present_location'])
 
-            if reply:
-                pack = {"Status":"OK","Message":"Created Sucessfully"}
-                answer = make_response(jsonify(pack),201)
+            if reply["message"] == "CREATED":
+                reply["Status"] = "OK"
+                answer = make_response(jsonify(reply),201)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
+            answer = make_response(jsonify(reply),401)
+            answer.content_type='application/json;charset=utf-8'
+            return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
         answer = make_response(jsonify(pack),400)
         answer.content_type='application/json;charset=utf-8'
@@ -81,12 +84,9 @@ class AParcels(Resource):
         if len(result.errors) < 1:
             all_parcels = SendItParcels(auth_user['user_id'])
             pack = all_parcels.get_parcel(str(parcel_id))
-            if (isinstance(pack, dict)):
-                reply = {
-                    "Status":"OK",
-                    "Parcel": pack
-                }
-                answer = make_response(jsonify(reply),200)
+            if (pack['message'] ==  "FOUND"):
+                pack["Status"] = "OK"
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
             answer = make_response(jsonify(pack),401)
@@ -145,9 +145,9 @@ class AParcels(Resource):
                 status = this_data['status'],
                 approved = this_data['approved'])
 
-            if reply == True :
-                pack = {"Status":"Edited successfully"}
-                answer = make_response(jsonify(pack),200)
+            if reply["message"] == 'EDITED':
+                reply["Status"] = "OK"
+                answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
             answer = make_response(jsonify(reply),401)
@@ -168,11 +168,8 @@ class AParcels(Resource):
         if len(result.errors) < 1:
             delete_order = SendItParcels(auth_user['user_id'])
             pack = delete_order.delete_parcel(str(parcel_id))
-            if pack:
-                reply = {
-                    "Status":"Deleted"
-                }
-                answer = make_response(jsonify(reply),200)
+            if pack["message"] == "deleted":
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
@@ -273,11 +270,8 @@ class CancelParcels(Resource):
         if len(result.errors) < 1:
             cancel_parcel = SendItParcels(auth_user['user_id'])
             pack = cancel_parcel.user_cancels_delivery(str(parcel_id))
-            if pack:
-                reply = {
-                    "Status":"Cancelled"
-                }
-                answer = make_response(jsonify(reply),200)
+            if pack["message"] == "cancelled":            
+                answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
             answer = make_response(jsonify(pack),401)

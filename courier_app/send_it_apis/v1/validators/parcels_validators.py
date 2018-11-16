@@ -7,6 +7,7 @@ from courier_app.send_it_apis.v1.models import (SendItUserOrders,
 class AddParcelSchema(Schema):
     owner_id = fields.Integer(required=True)
     weight= fields.String(required=True)
+    parcel_name = fields.String(required=True)
     submission_station=fields.String(required=True)
     present_location=fields.String(required=True)
 
@@ -29,6 +30,7 @@ class AddParcelSchema(Schema):
 
 class EditParcelSchema(Schema):
     parcel_id = fields.Integer(required=True)
+    parcel_name = fields.String()
     weight= fields.String()
     destination=fields.String()
     expected_pay=fields.String()

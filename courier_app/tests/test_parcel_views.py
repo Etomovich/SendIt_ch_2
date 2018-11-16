@@ -102,7 +102,8 @@ class ParcelViewCase(unittest.TestCase):
                 self.admin_id = item
 
         self.mk_parcel = json.dumps({
-            "owner_id":self.user_id, 
+            "owner_id":self.user_id,
+            "parcel_name":"parcel_name", 
             "weight":"456", 
             "submission_station":"Nairobi", 
             "present_location":"Nakuru"
@@ -120,7 +121,7 @@ class ParcelViewCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
         "This is an Admin Page contact admin for more help!!",
             msg="Get users not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -150,7 +151,7 @@ class ParcelViewCase(unittest.TestCase):
         output = answ.data.decode()
         output = json.loads(output)
     
-        self.assertEqual(output["Status"],"OK",
+        self.assertEqual(output["message"],"CREATED",
             msg="Create parcel not working properly!")
         self.assertEqual(answ.status_code,201,
             msg="Create parcel not working properly!")
@@ -177,7 +178,7 @@ class ParcelViewCase(unittest.TestCase):
 
         output = json.loads(answ.data.decode())
         print(output)
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
             "This is an Admin Page contact admin for more help!!",
             msg="Get users not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -219,7 +220,7 @@ class ParcelViewCase(unittest.TestCase):
 
         output = json.loads(answ.data.decode())
         print(output)
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
             "UNAUTHORIZED",
             msg="Get a parcel not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -231,7 +232,7 @@ class ParcelViewCase(unittest.TestCase):
 
         output = json.loads(answ.data.decode())
         
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
             "You are not authorized to view this page!!",
             msg="Get a parcel not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -288,7 +289,7 @@ class ParcelViewCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
-        self.assertEqual(output['Status'],'Edited successfully',
+        self.assertEqual(output['message'],'EDITED',
             msg="Edit a parcel not working properly!")
         self.assertEqual(answ.status_code,200,
             msg="Edit a parcel not working properly!")
@@ -300,7 +301,7 @@ class ParcelViewCase(unittest.TestCase):
 
         output = json.loads(answ.data.decode())
         print(output)
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
             "This is an Admin Page contact admin for more help!!",
             msg="Edit a parcel not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -312,7 +313,7 @@ class ParcelViewCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
             "This is an Admin Page contact admin for more help!!",
             msg="Get a parcel not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -343,8 +344,8 @@ class ParcelViewCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
-        print(output)
-        self.assertEqual(output,
+        
+        self.assertEqual(output["message"],
             "This is an Admin Page contact admin for more help!!",
             msg="Delete a parcel not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -355,7 +356,8 @@ class ParcelViewCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
-        self.assertEqual(output['Status'],"Deleted",
+        print(output)
+        self.assertEqual(output['message'],"deleted",
             msg="Delete a parcel not working properly!")
         self.assertEqual(answ.status_code,200,
             msg="Delete a parcel not working properly!")
@@ -366,7 +368,7 @@ class ParcelViewCase(unittest.TestCase):
 
         output = json.loads(answ.data.decode())
         
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
             "You are not authorized to view this page!!",
             msg="Delete a parcel not working properly!")
         self.assertEqual(answ.status_code,401,
@@ -398,7 +400,7 @@ class ParcelViewCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
-        self.assertEqual(output['Status'],"Cancelled",
+        self.assertEqual(output['message'],"cancelled",
             msg="Delete a parcel not working properly!")
         self.assertEqual(answ.status_code,200,
             msg="Delete a parcel not working properly!")
@@ -409,7 +411,7 @@ class ParcelViewCase(unittest.TestCase):
 
         output = json.loads(answ.data.decode())
         
-        self.assertEqual(output,
+        self.assertEqual(output["message"],
             "You are not authorized to view this page!!",
             msg="Delete a parcel not working properly!")
         self.assertEqual(answ.status_code,401,

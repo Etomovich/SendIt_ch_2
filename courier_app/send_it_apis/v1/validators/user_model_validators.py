@@ -1,7 +1,10 @@
+import re 
+
 from marshmallow import (Schema, fields, ValidationError,
         post_dump,post_load,validates, validates_schema)
 
 from courier_app.send_it_apis.v1.models import SystemUsers
+
 
 class CreateUserSchema(Schema):
     '''This schema validates user creation data '''
@@ -18,6 +21,9 @@ class CreateUserSchema(Schema):
         if data['password'] != data['retype_password']:
             raise ValidationError\
             ("[password] and [retype_password] should be equal.")
+        if len(data['password'].strip()) == 0:
+            raise ValidationError\
+            ("[password] cannot be null")
 
     @validates("role")
     def validate_role(self, role):
@@ -27,13 +33,27 @@ class CreateUserSchema(Schema):
 
     @validates("username")
     def validate_unique_username(self,username):
+        if not username.isalpha():
+            raise ValidationError\
+            ("[username] should only contain alphabetic letters.")
+            
         for item in SystemUsers.send_it_users.keys():
             if SystemUsers.send_it_users[item]['username'] == username:
                 raise ValidationError\
                 ("[username] is already taken.")
+        
+
 
     @validates("phone_number")
     def validate_unique_phone_number(self,phone_number):
+        r=re.compile("^[\+,\d]{1,}\d+$")
+
+        if not r.match(phone_number):
+            raise ValidationError\
+                ("[phone_number] should be an integer but"+
+                "can also begin with a plus for international"+
+                "calls.")
+
         for item in SystemUsers.send_it_users.keys():
             if SystemUsers.send_it_users[item]['phone_number'] == phone_number:
                 raise ValidationError\
@@ -69,6 +89,10 @@ class EditUserSchema(Schema):
                 raise ValidationError\
                 ("[password] and [retype_password] should be equal.")
 
+        if len(data['password'].strip()) == 0:
+            raise ValidationError\
+            ("[password] cannot be null")
+
     @validates("role")
     def validate_role(self, role):
         if role != "Admin" and role != "User":
@@ -77,6 +101,9 @@ class EditUserSchema(Schema):
 
     @validates("username")
     def validate_unique_username(self,username):
+        if not username.isalpha():
+            raise ValidationError\
+            ("[username] should only contain alphabetic letters.")
         for item in SystemUsers.send_it_users.keys():
             if SystemUsers.send_it_users[item]['username'] == username:
                 raise ValidationError\
@@ -84,11 +111,19 @@ class EditUserSchema(Schema):
 
     @validates("phone_no")
     def validate_unique_phone_number(self,phone_number):
+        r=re.compile("^[\+,\d]{1,}\d+$")
+
+        if not r.match(phone_number):
+            raise ValidationError\
+                ("[phone_number] should be a string of integers but"+
+                "can also begin with a plus for international"+
+                "calls.")
+
         for item in SystemUsers.send_it_users.keys():
             if SystemUsers.send_it_users[item]['phone_number'] == phone_number:
                 raise ValidationError\
                 ("[phone_number] is already taken.")
-    
+  
     @validates("email")
     def validate_unique_email(self,email):
         for item in SystemUsers.send_it_users.keys():

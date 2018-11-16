@@ -98,12 +98,12 @@ class UserViewsCase(unittest.TestCase):
         answ= self.client.post("/api/v1/register",
                 data=self.user,content_type='application/json')
 
-        wrong_my_data = json.dumps({
+        right_my_data = json.dumps({
                 "username":"anthony",
                 "password":"kimani"
-            })
+            }) 
         answ= self.client.post("/api/v1/login",
-                data=wrong_my_data,
+                data=right_my_data,
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
@@ -302,7 +302,7 @@ class UserViewsCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
-        self.assertEqual(output['Status'],"OK",
+        self.assertEqual(output['Status'],"Success",
             msg="Edit a user not working properly!")
         self.assertEqual(answ.status_code,200,
             msg="Edit a user not working properly!")

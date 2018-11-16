@@ -20,10 +20,7 @@ class Kurasa(object):
         self.no_of_pages = 0
 
         pages = len(self.list_data)/self.page_posts
-        if isinstance(pages, int):
-            self.no_of_pages = pages
-        else:
-            self.no_of_pages = int(pages) + 1
+        self.no_of_pages = int(pages) + 1
 
     
     def has_next(self, current_number):

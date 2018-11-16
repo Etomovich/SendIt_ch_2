@@ -65,10 +65,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add order function not working")
 
         parcel_id = ""
@@ -80,7 +80,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = false_user.add_order(parcel_id)
 
-        self.assertEqual(reply,"UNKNOWN_USER",
+        self.assertEqual(reply["message"],"UNKNOWN USER",
             msg="Add order function not working")
 
         reply = user_ob.add_order(parcel_id)
@@ -96,10 +96,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -130,7 +130,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
             destination="destination",
             submitted="submitted")
 
-        self.assertTrue(("fields[parcel_description" in reply),
+        self.assertTrue(("fields[parcel_description" in reply["message"]),
             msg="Add parcels function not working")
             
         reply = user_ob.edit_order_user(order_id = order_item["order_id"],
@@ -142,7 +142,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
             destination="destination",
             submitted="submitted")
 
-        self.assertEqual(reply,"EDITED",
+        self.assertEqual(reply["message"],"EDITED",
             msg="Add parcels function not working")
 
         reply = user_ob.edit_order_user(order_id = "1234",
@@ -154,7 +154,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
             destination="destination",
             submitted="submitted")
 
-        self.assertEqual(reply,"ORDER_NOT_FOUND",
+        self.assertEqual(reply["message"],"ORDER NOT FOUND",
             msg="Add parcels function not working")
 
         reply = false_user.edit_order_user(order_id = "1234",
@@ -166,7 +166,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
             destination="destination",
             submitted="submitted")
 
-        self.assertEqual(reply,"UNKNOWN USER",
+        self.assertEqual(reply["message"],"UNKNOWN USER",
             msg="Add parcels function not working")
     
     def test_process_order(self):
@@ -177,10 +177,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -208,7 +208,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
             order_status = "accepted",
             feedback = "Will begin transit soon")
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Add parcels function not working")
 
         reply = admin_ob.process_order(
@@ -216,7 +216,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
             order_status = "accepted",
             feedback = "Will begin transit soon")
 
-        self.assertEqual(reply,"DONE",
+        self.assertEqual(reply["message"],"PROCESSED",
             msg="Add parcels function not working")
 
     def test_remove_submission(self):
@@ -227,10 +227,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -256,19 +256,19 @@ class ParcelOrdersModelCase(unittest.TestCase):
         reply = false_user.remove_submission(
             order_id=order_item["order_id"])
 
-        self.assertEqual(reply,"UNKNOWN_USER",
+        self.assertEqual(reply["message"],"UNKNOWN USER",
             msg="Remove submission function not working")
         
         reply = user_ob.remove_submission(
             order_id=order_item["order_id"])
 
-        self.assertEqual(reply,"DONE",
+        self.assertEqual(reply["message"],"Submission Removed",
             msg="Remove submission function not working")
 
         reply = user_ob.remove_submission(
             order_id="1234")
 
-        self.assertEqual(reply,"ORDER_NOT_FOUND",
+        self.assertEqual(reply["message"],"ORDER NOT FOUND",
             msg="Remove submission function not working")
 
     def test_return_all_orders(self):
@@ -279,10 +279,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -307,7 +307,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = user_ob.return_all_orders()
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Return all orders function not working")
 
         reply = admin_ob.return_all_orders()
@@ -323,10 +323,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -351,7 +351,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = user_ob.return_all_unprocessed_orders()
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Return all orders function not working")
 
         reply = admin_ob.return_all_unprocessed_orders()
@@ -367,10 +367,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -395,7 +395,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = user_ob.return_an_order(order_item['order_id'])
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Return an order function not working")
 
         reply = admin_ob.return_an_order(order_item['order_id'])
@@ -405,7 +405,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = admin_ob.return_an_order("457777")
 
-        self.assertEqual(reply,"ORDER_NOT_FOUND",
+        self.assertEqual(reply["message"],"ORDER NOT FOUND",
             msg="Return all orders function not working")
         
     def test_return_my_order(self):
@@ -416,10 +416,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -444,12 +444,12 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = false_user.return_my_order(order_item['order_id'])
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="Return my order function not working")
 
         reply = user_ob.return_my_order('56467')
 
-        self.assertEqual(reply,"ORDER_NOT_FOUND",
+        self.assertEqual(reply["message"],"ORDER NOT FOUND",
             msg="Return my order function not working")
 
         reply = user_ob.return_my_order(order_item['order_id'])
@@ -465,10 +465,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -493,7 +493,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = false_user.my_processed_orders(self.pogie_id)
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="my_processed_orders function not working")
 
         reply = admin_ob.my_processed_orders(self.pogie_id)
@@ -509,10 +509,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -537,7 +537,7 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = false_user.my_unprocessed_orders(self.pogie_id)
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="my_processed_orders function not working")
 
         reply = admin_ob.my_unprocessed_orders(self.pogie_id)
@@ -553,10 +553,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -581,17 +581,17 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = false_user.user_order_deletion(order_item['order_id'])
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="user_order_deletion function not working")
 
         reply = user_ob.user_order_deletion("457777")
 
-        self.assertEqual(reply,"ORDER_PROCCESSED_OR_NOT_FOUND",
+        self.assertEqual(reply["message"],"ORDER PROCCESSED OR NOT FOUND",
             msg="Return all orders function not working")
 
         reply = user_ob.user_order_deletion(order_item['order_id'])
 
-        self.assertEqual(reply,"DELETED",
+        self.assertEqual(reply["message"],"DELETED",
             msg="Return all orders function not working")
 
     def test_admin_order_deletion(self):
@@ -602,10 +602,10 @@ class ParcelOrdersModelCase(unittest.TestCase):
         admin_parc = SendItParcels(self.etomovich_id)
 
         reply = admin_parc.add_parcel(self.pogie_id,\
-            "45","submission_station",\
+            "parecel_name","45","submission_station",\
                     "present_location")
 
-        self.assertEqual(reply,True,
+        self.assertEqual(reply["message"],"CREATED",
             msg="Add parcels function not working")
 
         parcel_id = ""
@@ -630,17 +630,17 @@ class ParcelOrdersModelCase(unittest.TestCase):
 
         reply = user_ob.admin_order_deletion(order_item['order_id'])
 
-        self.assertEqual(reply,"UNAUTHORIZED",
+        self.assertEqual(reply["message"],"UNAUTHORIZED",
             msg="user_order_deletion function not working")
 
         reply = admin_ob.admin_order_deletion("457777")
 
-        self.assertEqual(reply,"ORDER_NOT_FOUND",
+        self.assertEqual(reply["message"],"ORDER NOT FOUND",
             msg="Return all orders function not working")
 
         reply = admin_ob.admin_order_deletion(order_item['order_id'])
 
-        self.assertEqual(reply,"DELETED",
+        self.assertEqual(reply["message"],"DELETED",
             msg="Return all orders function not working")
 
         

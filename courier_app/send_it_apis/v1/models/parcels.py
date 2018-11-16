@@ -18,7 +18,7 @@ class SendItParcels(object):
         except:
             return False
 
-    def add_parcel(self,owner_id,weight,submission_station,\
+    def add_parcel(self,owner_id,parcel_name,weight,submission_station,\
                     present_location):
         '''This is an admin function that is activated when the customer 
         brings a parcel to a station and its details are taken by an ADMIN. 
@@ -33,6 +33,7 @@ class SendItParcels(object):
                 "owner_id": str(owner_id),
                 "expected_pay": "",
                 "order_id": "",
+                "parcel_name": parcel_name,
                 "submission_station": submission_station,
                 "present_location":present_location,
                 "weight": float(weight),
@@ -43,16 +44,21 @@ class SendItParcels(object):
                 "approved":"No"
             }            
             SendItParcels.sendit_parcels[str(new_id)] = payload
-            return True            
-        return "UNAUTHORIZED"
+            reply = payload
+            reply["message"] = "CREATED"
+            return reply              
+        return {"message":"UNAUTHORIZED"}
 
-    def edit_parcel(self,parcel_id,weight=None,destination=None,\
-        expected_pay=None,submission_station=None,feedback=None,\
-        order_id=None, owner_id=None,present_location=None,\
-        status=None, approved = None):
+    def edit_parcel(self,parcel_id,parcel_name=None,weight=None,
+            destination=None, expected_pay=None,submission_station=None,
+            feedback=None, order_id=None, owner_id=None,
+            present_location=None, status=None, approved = None):
         '''This method allows an admin to edit a parcel.'''
         this_user = self._user_is_there()
         if this_user and this_user['role'] == "Admin":
+            if parcel_name:
+                SendItParcels.sendit_parcels[str(parcel_id)]\
+                ['parcel_name'] = str(parcel_name)
             if approved:
                 SendItParcels.sendit_parcels[str(parcel_id)]\
                 ['approved'] = str(approved)
@@ -84,8 +90,10 @@ class SendItParcels(object):
                 SendItParcels.sendit_parcels[str(parcel_id)]\
                 ['status'] = str(status)
 
-            return True
-        return "UNAUTHORIZED"
+            payload =  SendItParcels.sendit_parcels[str(parcel_id)]
+            payload["message"] = "EDITED"
+            return payload
+        return {"message":"UNAUTHORIZED"} 
 
     def user_cancels_delivery(self, parcel_id):
         '''This method implements a user cancelling a delivery. It is 
@@ -95,8 +103,11 @@ class SendItParcels(object):
             [str(parcel_id)]['owner_id']:
             SendItParcels.sendit_parcels[str(parcel_id)]\
             ['status'] = "cancelled"
-            return True
-        return "UNAUTHORIZED"        
+            return {
+                "message": "cancelled",
+                "Cancelled Parcel": SendItParcels.sendit_parcels[str(parcel_id)]
+                }
+        return {"message":"UNAUTHORIZED"}        
 
     def get_all_parcels(self):
         '''This method returns all parcels in the system which makes it an 
@@ -109,7 +120,7 @@ class SendItParcels(object):
                 payload["parcel_id"] = item
                 reply.append(payload)
             return reply
-        return "UNAUTHORIZED"
+        return {"message":"UNAUTHORIZED"}
 
     def delete_parcel(self, parcel_id):
         '''This method deletes a parcels in the system which makes it an 
@@ -117,8 +128,8 @@ class SendItParcels(object):
         this_user = self._user_is_there()
         if this_user and this_user['role'] == "Admin":
             del SendItParcels.sendit_parcels[str(parcel_id)]
-            return True
-        return "UNAUTHORIZED"
+            return {"message":"deleted"}
+        return {"message":"UNAUTHORIZED"}
 
     def get_parcel(self, parcel_id):
         '''This method is only available to the admin and user who delivered
@@ -127,8 +138,10 @@ class SendItParcels(object):
         if this_user and (this_user['role']\
             == "Admin" or this_user['user_id'] == SendItParcels.\
             sendit_parcels[str(parcel_id)]['owner_id']):
-            return SendItParcels.sendit_parcels[str(parcel_id)]
-        return "UNAUTHORIZED"
+            payload= SendItParcels.sendit_parcels[str(parcel_id)]
+            payload["message"] = "FOUND"
+            return payload
+        return {"message":"UNAUTHORIZED"}
 
     def get_all_my_parcels(self, user_id):
         '''This method is only available to the admin and user who delivered
@@ -142,7 +155,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                     reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        return "UNAUTHORIZED"
+        return {"message":"UNAUTHORIZED"}
     
     def get_my_approved_parcels(self,user_id):
         '''This method is only available to the admin and user who delivered
@@ -157,7 +170,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                     reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        return "UNAUTHORIZED"
+        return {"message":"UNAUTHORIZED"}
 
     def get_my_notstarted_parcels(self, user_id):
         '''This method is only available to the admin and user who delivered
@@ -173,7 +186,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                     reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        return "UNKNOWN_USER"
+        return {"message":"UNKNOWN USER"}
 
     def get_my_intransit_parcels(self, user_id):
         '''This method is only available to the admin and user who delivered
@@ -189,7 +202,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                     reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        return "UNKNOWN_USER"
+        return {"message":"UNKNOWN USER"}
     
     def get_my_cancelled_parcels(self,user_id):
         '''This method is only available to the admin and user who delivered
@@ -205,7 +218,7 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                         reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        return "UNKNOWN_USER"
+        return {"message":"UNKNOWN USER"}
 
     def get_my_delivered_parcels(self, user_id):
         '''This method is only available to the admin and user who delivered
@@ -221,6 +234,6 @@ class SendItParcels(object):
                     this_user['user_id'] == str(user_id))):
                         reply.append(SendItParcels.sendit_parcels[item])
             return reply
-        return "UNKNOWN_USER"
+        return {"message":"UNKNOWN USER"}
 
 
