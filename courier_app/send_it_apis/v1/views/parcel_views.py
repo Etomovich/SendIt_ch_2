@@ -1,3 +1,4 @@
+import os
 from flask import request, make_response, jsonify
 from flask_restful import Resource
 from marshmallow import (Schema, fields, ValidationError,
@@ -15,6 +16,8 @@ from instance.config import Config
 
 from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
+
+BASE_URL = os.getenv('PAGINATE_BASE_URL')
 
 class AllParcels(Resource):
     def get(self):
@@ -34,9 +37,9 @@ class AllParcels(Resource):
                 "All Parcels": page_items,
                 "Total Parcels": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels?page="+\
+                "Next Page":BASE_URL+"/api/v1/parcels?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels?page="+\
+                "Prev Page":BASE_URL+"/api/v1/parcels?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)
@@ -199,10 +202,10 @@ class UserParcels(Resource):
                     "Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/users/"\
+                    "Next Page":BASE_URL+"/api/v1/users/"\
                         +str(user_id)+"/parcels?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/users/"\
+                    "Prev Page":BASE_URL+"/api/v1/users/"\
                         +str(user_id)+"/parcels?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -239,10 +242,10 @@ class ApprovedParcels(Resource):
                     "Approved Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/approved?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/approved?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -304,10 +307,10 @@ class NotStartedParcels(Resource):
                     "Not Started Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/not-started?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/not-started?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -344,10 +347,10 @@ class InTransitParcels(Resource):
                     "Intransit Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/in-transit?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/in-transit?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -384,10 +387,10 @@ class CancelledParcels(Resource):
                     "Cancelled Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/cancelled?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/cancelled?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }
@@ -424,10 +427,10 @@ class DeliveredParcels(Resource):
                     "Delivered Parcels": page_items,
                     "Total Parcels": len(pack),
                     "Total Pages": str(kur.no_of_pages),
-                    "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Next Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/delivered?page="+\
                         str(page+1) if kur.has_next(page) else "END",
-                    "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/parcels/"\
+                    "Prev Page":BASE_URL+"/api/v1/parcels/"\
                         +str(user_id)+"/delivered?page="+\
                         str(page-1) if kur.has_prev(page) else "BEGINNING"
                 }

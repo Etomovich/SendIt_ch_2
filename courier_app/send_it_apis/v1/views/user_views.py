@@ -1,3 +1,4 @@
+import os
 from flask import request, make_response, jsonify
 from flask_restful import Resource
 from marshmallow import Schema, fields, ValidationError,\
@@ -11,6 +12,8 @@ from instance.config import Config
 
 from itsdangerous import (TimedJSONWebSignatureSerializer as
         Serializer, BadSignature, SignatureExpired)
+
+BASE_URL = os.getenv('PAGINATE_BASE_URL') 
 
 class CreateUser(Resource):
     def post(self):
@@ -76,9 +79,9 @@ class FetchAllUsers(Resource):
                 "Users": page_items,
                 "Total Users": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
+                "Next Page":BASE_URL+"/api/v1/users?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
+                "Prev Page":BASE_URL+"/api/v1/users?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)

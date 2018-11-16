@@ -1,3 +1,4 @@
+import os
 from flask import request, make_response, jsonify
 from flask_restful import Resource
 from marshmallow import (Schema, fields, ValidationError,
@@ -14,7 +15,9 @@ from courier_app.send_it_apis.pagination import Kurasa
 from instance.config import Config
 
 from itsdangerous import (TimedJSONWebSignatureSerializer as
-        Serializer, BadSignature, SignatureExpired) 
+        Serializer, BadSignature, SignatureExpired)
+
+BASE_URL = os.getenv('PAGINATE_BASE_URL') 
 
 class Home(Resource):
     def get(self):
@@ -44,9 +47,9 @@ class AllOrders(Resource):
                 "Orders": page_items,
                 "Total Orders": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
+                "Next Page":BASE_URL+"/api/v1/users?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/users?page="+\
+                "Prev Page":BASE_URL+"/api/v1/users?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)
@@ -314,9 +317,9 @@ class AllUnprocessedOrders(Resource):
                 "Orders": page_items,
                 "Total Orders": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/unprocessed?page="+\
+                "Next Page":BASE_URL+"/api/v1/orders/unprocessed?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/unprocessed?page="+\
+                "Prev Page":BASE_URL+"/api/v1/orders/unprocessed?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
             answer = make_response(jsonify(reply),200)
@@ -344,10 +347,10 @@ class MyProcessedOrders(Resource):
                 "Orders": page_items,
                 "Total Orders": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/"\
+                "Next Page":BASE_URL+"/api/v1/orders/"\
                     +str(user_id)+"/processed?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/"\
+                "Prev Page":BASE_URL+"/api/v1/orders/"\
                     +str(user_id)+"/processed?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
@@ -376,10 +379,10 @@ class MyUnprocessedOrders(Resource):
                 "Orders": page_items,
                 "Total Orders": len(pack),
                 "Total Pages": str(kur.no_of_pages),
-                "Next Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/"\
+                "Next Page":BASE_URL+"/api/v1/orders/"\
                     +str(user_id)+"/unprocessed?page="+\
                     str(page+1) if kur.has_next(page) else "END",
-                "Prev Page":"https://etomovich-sendit.herokuapp.com/api/v1/orders/"\
+                "Prev Page":BASE_URL+"/api/v1/orders/"\
                     +str(user_id)+"/unprocessed?page="+\
                     str(page-1) if kur.has_prev(page) else "BEGINNING"
             }
