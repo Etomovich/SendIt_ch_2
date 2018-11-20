@@ -9,7 +9,7 @@ install:
 services:
   - postgresql
 addons:
-  postgresql: "9.5"
+  - postgresql: "9.5"
 
 before_script:
   - psql -c 'CREATE DATABASE sendit_db' -U postgres
