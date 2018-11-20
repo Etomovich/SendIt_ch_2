@@ -68,7 +68,15 @@ class SystemUsers(object):
                         return {"message":"UNAUTHORIZED<Field:'role'>"}
                 my_user = SystemUsers.send_it_users[str(user_id)]
                 my_user["message"] = "Authorized"
-                return my_user
+                out_data = {
+                    "message": my_user['message'],
+                    "user_id": my_user['user_id'],
+                    "username": my_user['username'],
+                    "email": my_user['email'],
+                    "phone_number": my_user['phone_number'],
+                    "role": my_user['role']
+                }
+                return out_data
             return {"message":"UNAUTHORIZED"}
         return {"message":"UNAUTHORIZED"}
                    
@@ -83,7 +91,16 @@ class SystemUsers(object):
                     my_user = SystemUsers.send_it_users[str(userid)]
                     my_user["user_id"] = str(userid)
                     my_user["message"] = "Authorized"
-                    return my_user
+
+                    out_data = {
+                        "message": my_user['message'],
+                        "user_id": my_user['user_id'],
+                        "username": my_user['username'],
+                        "email": my_user['email'],
+                        "phone_number": my_user['phone_number'],
+                        "role": my_user['role']
+                    }
+                    return out_data
                 return {"message":"UNAUTHORIZED"}
             return {"message":"UNKNOWN USER"}
         except:
@@ -124,7 +141,14 @@ class SystemUsers(object):
             for thing in SystemUsers.send_it_users.keys():
                 user = SystemUsers.send_it_users[thing]
                 user["user_id"] = thing
-                reply.append(user)
+                out_data = {
+                    "user_id": user['user_id'],
+                    "username": user['username'],
+                    "email": user['email'],
+                    "phone_number": user['phone_number'],
+                    "role": user['role']
+                }
+                reply.append(out_data)
             return reply
         return {"message":"UNAUTHORIZED"}
 

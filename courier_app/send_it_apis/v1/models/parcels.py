@@ -30,6 +30,7 @@ class SendItParcels(object):
         if this_user and this_user['role'] == "Admin":
             new_id = uuid.uuid4().int
             payload = {
+                "parcel_id": new_id,
                 "owner_id": str(owner_id),
                 "expected_pay": "",
                 "order_id": "",
