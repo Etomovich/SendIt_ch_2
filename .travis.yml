@@ -16,9 +16,8 @@ before_script:
   - psql -c 'CREATE DATABASE sendit_test_db' -U postgres
   - psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to postgres;" -U postgres
   - psql -c "ALTER USER postgres WITH PASSWORD '1234';" -U postgres
-
-before_script:
   - export PYTHONPATH=`pwd`
+
 # command to run tests
 script: 
   - nosetests courier_app/tests --with-coverage --cover-package=courier_app
