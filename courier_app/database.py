@@ -1,35 +1,36 @@
 import psycopg2
-import os
+from psycopg2 import connect
+from instance.config import Config
 
-url = os.getenv("DB_URL")
-
-def connection(url):
+print
+def connection():
     try:
-        con = psycopg2.connect(url)
+        con = psycopg2.connect(Config.MAIN_URL)
         return con
     except (Exception, psycopg2.Error) as error :
-        print ("Connection to Postgres Fialed!! ", error)
-
+        print ("Connection to Postgres Failed!! ", error)
 
 def create_relations():
-    con = connection(url)
-    cursor = con.cursor()
+    con = connection()
+    cur = con.cursor()
     queries = sendit_relations()
     for query in queries:
-        cursor.execute(query)
+        cur.execute(query)
     con.commit()
+    con.close()
     return True
 
 def remove_all_tables():
     con = connection(url)
-    cursor = con.cursor()
+    cur = con.cursor()
     tab1 = """DROP TABLE IF EXIST sendit_users CASCADE"""
     tab2 = """DROP TABLE IF EXIST sendit_orders CASCADE"""
     tab3 = """DROP TABLE IF EXIST sendit_parcels CASCADE"""
-    cursor.execute(tab1)
-    cursor.execute(tab2)
-    cursor.execute(tab3)
+    cur.execute(tab1)
+    cur.execute(tab2)
+    cur.execute(tab3)
     con.commit()
+    con.close()
     return True
 
 def sendit_relations():

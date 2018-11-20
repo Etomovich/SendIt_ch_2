@@ -1,4 +1,5 @@
 from flask import Flask
+import psycopg2
 from instance.config import Config
 from courier_app.send_it_apis.v1 import bp as api_v1_bp
 from courier_app.send_it_apis.v1 import v1_bp

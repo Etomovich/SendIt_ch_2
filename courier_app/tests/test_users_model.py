@@ -108,9 +108,6 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(reply["phone_number"],"034556", 
             msg="Edit User not working")
 
-        reply = admin_ob.edit_user(pogie_id, password="pogz")
-        self.assertEqual(reply["password"],"pogz", 
-            msg="Edit User not working")
 
     def test_get_a_user(self):
         users_DB = SystemUsers(0000)

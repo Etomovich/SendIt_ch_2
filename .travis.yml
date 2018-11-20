@@ -5,6 +5,17 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install coveralls
+services:
+  - postgresql
+addons:
+  postgresql: "9.5"
+
+before_script:
+  - psql -c "CREATE USER etomovich WITH PASSWORD 'etomovich';" -U postgres
+  - psql -c 'CREATE DATABASE sendit_db' -U etomovich
+  - psql -c 'CREATE DATABASE sendit_test_db' -U etomovich
+  - psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to etomovich;" -U postgres
+
 before_script:
   - export PYTHONPATH=`pwd`
 # command to run tests
