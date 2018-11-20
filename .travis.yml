@@ -17,10 +17,6 @@ before_script:
   - psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to postgres;" -U postgres
   - psql -c "ALTER USER postgres WITH PASSWORD '1234';" -U postgres
 
-env:
-  - DB_URL="dbname='sendit_db' host='localhost' user='postgres' port='5432' password='1234'"
-  - TEST_DB_URL="dbname='sendit_test_db' host='localhost' user='postgres' port='5432' password='1234'"
-
 before_script:
   - export PYTHONPATH=`pwd`
 # command to run tests
