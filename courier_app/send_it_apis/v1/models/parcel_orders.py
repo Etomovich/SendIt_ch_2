@@ -25,7 +25,7 @@ class SendItUserOrders(object):
         from courier_app.send_it_apis.v1.models import SendItParcels
         
         if this_user:
-            new_id = uuid.uuid4().int
+            new_id = uuid.uuid4().int 
            
             payload = {
                 "order_id": str(new_id),#CG
@@ -202,8 +202,6 @@ class SendItUserOrders(object):
             return {"message":"ORDER NOT FOUND"}        
         return {"message":"UNAUTHORIZED"}
 
-
-    #
     def user_order_deletion(self, order_id):
         '''This method allows a user to delete an order that has been
         rejected or yet to be processed'''

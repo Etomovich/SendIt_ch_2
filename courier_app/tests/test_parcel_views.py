@@ -1,7 +1,7 @@
 import unittest
 import json
 from flask import jsonify
-from instance.config import Config
+from instance.config import Config, TestConfiguration
 from courier_app.send_it_apis.v1.models import (SystemUsers,
     SendItParcels, SendItUserOrders)
 from itsdangerous import (TimedJSONWebSignatureSerializer
@@ -11,7 +11,7 @@ from courier_app import create_app
 class ParcelViewCase(unittest.TestCase):
 
     def setUp(self):
-        self.app = create_app()
+        self.app = create_app(TestConfiguration)
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()
