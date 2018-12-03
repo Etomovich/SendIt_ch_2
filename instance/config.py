@@ -11,3 +11,6 @@ class TestConfiguration(Config):
     DEBUG = True
     TESTING = True
     TEST_URL = os.getenv("TEST_DB_URL")
+
+class MyDatabasebUrl(object):
+    CURRENT_URL = Config.MAIN_URL

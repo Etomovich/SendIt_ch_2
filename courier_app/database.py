@@ -1,32 +1,15 @@
 import psycopg2
 from psycopg2 import connect
-from instance.config import Config, TestConfiguration
+from instance.config import MyDatabasebUrl
 
 def connection():
     try:
         print("Establishing connection to Postgres DB....")
-        con = psycopg2.connect(Config.MAIN_URL)
+        con = psycopg2.connect(MyDatabasebUrl.CURRENT_URL)
         return con
     except (Exception, psycopg2.Error) as error :
         print ("Connection to Postgres Failed!! ", error)
 
-def tests_connection():
-    try:
-        print("Establishing connection to Postgres DB....")
-        con = psycopg2.connect(TestConfiguration.TEST_URL)
-        return con
-    except (Exception, psycopg2.Error) as error :
-        print ("Connection to Postgres Failed!! ", error)
-
-def create_test_relations():
-    con = tests_connection()
-    cur = con.cursor()
-    queries = sendit_relations()
-    for query in queries:
-        cur.execute(query)
-    con.commit()
-    con.close()
-    return True
 
 def create_relations():
     con = connection()
@@ -41,9 +24,9 @@ def create_relations():
 def remove_all_tables():
     con = connection()
     cur = con.cursor()
-    tab1 = """DROP TABLE IF EXIST sendit_users CASCADE;"""
-    tab2 = """DROP TABLE IF EXIST sendit_orders CASCADE;"""
-    tab3 = """DROP TABLE IF EXIST sendit_parcels CASCADE;"""
+    tab1 = """DROP TABLE sendit_users CASCADE;"""
+    tab2 = """DROP TABLE sendit_orders CASCADE;"""
+    tab3 = """DROP TABLE sendit_parcels CASCADE;"""
     cur.execute(tab1)
     cur.execute(tab2)
     cur.execute(tab3)

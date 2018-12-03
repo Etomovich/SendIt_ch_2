@@ -7,11 +7,15 @@ from courier_app.send_it_apis.v2.models import (SystemUsers,
 from itsdangerous import (TimedJSONWebSignatureSerializer
      as Serializer, BadSignature, SignatureExpired)
 from courier_app import create_app
+from courier_app.database import remove_all_tables
 
 class ParcelViewCase(unittest.TestCase):
 
     def setUp(self):
-        self.app = create_app(TestConfiguration)
+        self.app = create_app(
+            config_class=TestConfiguration,
+            testing=True
+        )
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -39,15 +43,21 @@ class ParcelViewCase(unittest.TestCase):
             "password":"luka",
             "role":"User",
             "retype_password":"luka"})
+            
+        answ= self.client.post("/api/v2/register",
+                data=self.user_3,content_type='application/json')
 
-        answ= self.client.post("/api/v1/register",
-            data=self.user_3,content_type='application/json')
+        self.user_3_data = json.loads(answ.data.decode())
 
-        answ= self.client.post("/api/v1/register",
-            data=self.user_2,content_type='application/json')
+        answ= self.client.post("/api/v2/register",
+                data=self.user_1,content_type='application/json')
 
-        answ= self.client.post("/api/v1/register",
-            data=self.user_1,content_type='application/json')
+        self.user_1_data = json.loads(answ.data.decode())
+
+        answ= self.client.post("/api/v2/register",
+                data=self.user_2,content_type='application/json')
+
+        self.user_2_data = json.loads(answ.data.decode())
 
         #get admin and user tokens
         admin_login = json.dumps({
@@ -63,43 +73,31 @@ class ParcelViewCase(unittest.TestCase):
                 "username":"anthony",
                 "password":"kimani"
             })        
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=admin_login,
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
         self.admin_token = output["Token"]
 
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=user2_login,
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
         self.user2_token = output["Token"]
 
-        answ1= self.client.post("/api/v1/login",
+        answ1= self.client.post("/api/v2/login",
                 data=user_login,
                 content_type='application/json')
         output = json.loads(answ1.data.decode())
         self.user_token = output["Token"]
 
-        self.user_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "omushambulizi":
-                self.user_id = item
+        self.user_id = self.user_3_data["User"]["user_id"]
 
-        self.user2_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "anthony":
-                self.user2_id = item
+        self.user2_id = self.user_2_data["User"]["user_id"]
 
-        self.admin_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "etomovich":
-                self.admin_id = item
+        self.admin_id = self.user_1_data["User"]["user_id"] 
 
         self.mk_parcel = json.dumps({
             "owner_id":self.user_id,
@@ -110,12 +108,10 @@ class ParcelViewCase(unittest.TestCase):
         })
     
     def tearDown(self):
-        SystemUsers.send_it_users = {}
-        SendItParcels.sendit_parcels ={}
-        SendItUserOrders.sendit_user_orders ={}
+        toa = remove_all_tables()
 
     def test_create_parcel(self):
-        answ= self.client.post("/api/v1/parcels",
+        answ= self.client.post("/api/v2/parcels",
                 data = self.mk_parcel,
                 headers={'Authorization': self.user_token},
                 content_type='application/json')
@@ -133,7 +129,7 @@ class ParcelViewCase(unittest.TestCase):
             "present_location":"Nakuru"
         })
 
-        answ= self.client.post("/api/v1/parcels",
+        answ= self.client.post("/api/v2/parcels",
                 data = the_parcel,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
@@ -143,7 +139,7 @@ class ParcelViewCase(unittest.TestCase):
             msg="Creating parcel not working properly!")
 
 
-        answ= self.client.post("/api/v1/parcels",
+        answ= self.client.post("/api/v2/parcels",
                 data = self.mk_parcel,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
@@ -157,12 +153,12 @@ class ParcelViewCase(unittest.TestCase):
             msg="Create parcel not working properly!")
 
     def test_get_all_parcels(self):
-        answ= self.client.post("/api/v1/parcels",
+        answ= self.client.post("/api/v2/parcels",
                 data = self.mk_parcel,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
 
-        answ= self.client.get("/api/v1/parcels",
+        answ= self.client.get("/api/v2/parcels",
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
         
@@ -172,7 +168,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,200,
             msg="Get users not working properly!")
 
-        answ= self.client.get("/api/v1/parcels",
+        answ= self.client.get("/api/v2/parcels",
                 headers={'Authorization': self.user_token},
                 content_type='application/json')
 
@@ -184,7 +180,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Get users not working properly!")
 
-        answ= self.client.get("/api/v1/parcels",
+        answ= self.client.get("/api/v2/parcels",
                 headers={'Authorization': '98765432'},
                 content_type='application/json')
 
@@ -193,18 +189,15 @@ class ParcelViewCase(unittest.TestCase):
             msg="Get users not working properly!")
 
     def test_get_a_parcel(self):
-        answ= self.client.post("/api/v1/parcels",
+        answ= self.client.post("/api/v2/parcels",
                 data = self.mk_parcel,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
         
-        self.parcel_id = ""
-        for item in SendItParcels.sendit_parcels.keys():
-            if SendItParcels.sendit_parcels[item]['owner_id'] \
-            == self.user_id:
-                self.parcel_id = item
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
 
-        answ= self.client.get("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.get("/api/v2/parcels/"+str(self.parcel_id),
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
 
@@ -214,7 +207,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,200,
             msg="Get a parcel not working properly!")
 
-        answ= self.client.get("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.get("/api/v2/parcels/"+str(self.parcel_id),
                 headers={'Authorization': self.user2_token},
                 content_type='application/json')
 
@@ -226,7 +219,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Get a parcel not working properly!")
 
-        answ= self.client.get("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.get("/api/v2/parcels/"+str(self.parcel_id),
                 headers={'Authorization': '3455666'},
                 content_type='application/json')
 
@@ -238,7 +231,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Get a parcel not working properly!")
 
-        answ= self.client.get("/api/v1/parcels/5435345",
+        answ= self.client.get("/api/v2/parcels/5435345",
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
 
@@ -247,28 +240,13 @@ class ParcelViewCase(unittest.TestCase):
             msg="Get a parcel not working properly!")
 
     def test_edit_a_parcel(self):
-        answ= self.client.post("/api/v1/parcels",
+        answ= self.client.post("/api/v2/parcels",
                 data = self.mk_parcel,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
         
-        self.parcel_id = ""
-        for item in SendItParcels.sendit_parcels.keys():
-            if SendItParcels.sendit_parcels[item]['owner_id'] \
-            == self.user_id:
-                self.parcel_id = item
-
-        payload = {
-                "order_id": "345677",#CG
-                "owner_id": self.user_id,#CG
-                "parcel_id": str(self.parcel_id),
-                "submitted": "False",#u
-                "order_status": "unprocessed",#A
-                "feedback":""#A
-            } 
-
-        SendItUserOrders.sendit_user_orders[self.user_id]=\
-            [payload]
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
 
         this_data =json.dumps({
                 "weight": "4567",
@@ -276,25 +254,24 @@ class ParcelViewCase(unittest.TestCase):
                 "expected_pay":"2345",
                 "submission_station":"submission_station",
                 "feedback": "feedback",
-                "order_id": "345677",
-                "owner_id": self.user_id,
                 "present_location": "present_location",
                 "status": "in_transit",
                 "approved": "approved"
         })
 
-        answ= self.client.put("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id),
                 data= this_data,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
+        print(output)
         self.assertEqual(output['message'],'EDITED',
             msg="Edit a parcel not working properly!")
         self.assertEqual(answ.status_code,200,
             msg="Edit a parcel not working properly!")
 
-        answ= self.client.put("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id),
                 data= this_data,
                 headers={'Authorization': self.user2_token},
                 content_type='application/json')
@@ -307,7 +284,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Edit a parcel not working properly!")
 
-        answ= self.client.put("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id),
                 data= this_data,
                 headers={'Authorization': self.user_token},
                 content_type='application/json')
@@ -319,7 +296,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Get a parcel not working properly!")
 
-        answ= self.client.get("/api/v1/parcels/5435345",
+        answ= self.client.get("/api/v2/parcels/5435345",
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
 
@@ -328,18 +305,15 @@ class ParcelViewCase(unittest.TestCase):
             msg="Get a parcel not working properly!")
 
     def test_delete_a_parcel(self):
-        answ= self.client.post("/api/v1/parcels",
+        answ= self.client.post("/api/v2/parcels",
                 data = self.mk_parcel,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
         
-        self.parcel_id = ""
-        for item in SendItParcels.sendit_parcels.keys():
-            if SendItParcels.sendit_parcels[item]['owner_id'] \
-            == self.user_id:
-                self.parcel_id = item
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
 
-        answ= self.client.delete("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.delete("/api/v2/parcels/"+str(self.parcel_id),
                 headers={'Authorization': self.user_token},
                 content_type='application/json')
 
@@ -351,7 +325,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Delete a parcel not working properly!")
 
-        answ= self.client.delete("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.delete("/api/v2/parcels/"+str(self.parcel_id),
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
 
@@ -362,7 +336,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,200,
             msg="Delete a parcel not working properly!")
 
-        answ= self.client.delete("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.delete("/api/v2/parcels/"+str(self.parcel_id),
                 headers={'Authorization': '3455666'},
                 content_type='application/json')
 
@@ -374,7 +348,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Delete a parcel not working properly!")
 
-        answ= self.client.delete("/api/v1/parcels/5435345",
+        answ= self.client.delete("/api/v2/parcels/5435345",
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
 
@@ -383,18 +357,15 @@ class ParcelViewCase(unittest.TestCase):
             msg="Delete a parcel not working properly!")
 
     def test_cancel_a_parcel(self):
-        answ= self.client.post("/api/v1/parcels",
+        answ= self.client.post("/api/v2/parcels",
                 data = self.mk_parcel,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
         
-        self.parcel_id = ""
-        for item in SendItParcels.sendit_parcels.keys():
-            if SendItParcels.sendit_parcels[item]['owner_id'] \
-            == self.user_id:
-                self.parcel_id = item
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
 
-        answ= self.client.put("/api/v1/parcels/"+str(self.parcel_id)+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+
                 "/cancel",
                 headers={'Authorization': self.user_token},
                 content_type='application/json')
@@ -405,7 +376,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,200,
             msg="Delete a parcel not working properly!")
 
-        answ= self.client.delete("/api/v1/parcels/"+str(self.parcel_id),
+        answ= self.client.delete("/api/v2/parcels/"+str(self.parcel_id),
                 headers={'Authorization': '3455666'},
                 content_type='application/json')
 
@@ -417,7 +388,7 @@ class ParcelViewCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Delete a parcel not working properly!")
 
-        answ= self.client.delete("/api/v1/parcels/5435345",
+        answ= self.client.delete("/api/v2/parcels/5435345",
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
 

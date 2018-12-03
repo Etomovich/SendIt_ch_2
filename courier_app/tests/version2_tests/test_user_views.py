@@ -7,11 +7,15 @@ from courier_app.send_it_apis.v2.models import (SystemUsers,
 from itsdangerous import (TimedJSONWebSignatureSerializer
      as Serializer, BadSignature, SignatureExpired)
 from courier_app import create_app
+from courier_app.database import remove_all_tables
 
 class UserViewsCase(unittest.TestCase):
     def setUp(self):
-        self.app = create_app()
-        self.client = self.app.test_client(TestConfiguration)
+        self.app = create_app(
+            config_class=TestConfiguration,
+            testing=True
+        )
+        self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()
 
@@ -46,19 +50,21 @@ class UserViewsCase(unittest.TestCase):
             "role":"User",
             "retype_password":"luka"})
 
-        answ= self.client.post("/api/v1/register",
+        answ= self.client.post("/api/v2/register",
                 data=self.user_3,content_type='application/json')
 
-        answ= self.client.post("/api/v1/register",
+        self.user_3_data = json.loads(answ.data.decode())
+
+        answ= self.client.post("/api/v2/register",
                 data=self.user_1,content_type='application/json')
-        
+
+        self.user_1_data = json.loads(answ.data.decode())
+       
     def tearDown(self):
-        SystemUsers.send_it_users = {}
-        SendItParcels.sendit_parcels ={}
-        SendItUserOrders.sendit_user_orders ={}
+        toa = remove_all_tables()
 
     def test_create_user(self):
-        answ= self.client.post("/api/v1/register",
+        answ= self.client.post("/api/v2/register",
                 data=self.user,content_type='application/json')
         output = json.loads(answ.data.decode())
         self.assertEqual(output['Status'],"Created",
@@ -67,7 +73,7 @@ class UserViewsCase(unittest.TestCase):
             msg="Register not working properly!")
 
     def test_wrong_create_user(self): 
-        answ= self.client.post("/api/v1/register",
+        answ= self.client.post("/api/v2/register",
                 data=self.user_2,content_type='application/json')
         
         output = json.loads(answ.data.decode())
@@ -77,14 +83,14 @@ class UserViewsCase(unittest.TestCase):
             msg="Register not working properly!")
 
     def test_login_invalid_user(self):
-        answ= self.client.post("/api/v1/register",
+        answ= self.client.post("/api/v2/register",
                 data=self.user,content_type='application/json')
 
         wrong_my_data = json.dumps({
                 "username":"anthony",
                 "password":"ancom"
             })
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=wrong_my_data,
                 content_type='application/json')
 
@@ -95,14 +101,14 @@ class UserViewsCase(unittest.TestCase):
             msg="Register not working properly!")
 
     def test_login_valid_user(self):
-        answ= self.client.post("/api/v1/register",
+        answ= self.client.post("/api/v2/register",
                 data=self.user,content_type='application/json')
 
         right_my_data = json.dumps({
                 "username":"anthony",
                 "password":"kimani"
             }) 
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=right_my_data,
                 content_type='application/json')
 
@@ -113,13 +119,13 @@ class UserViewsCase(unittest.TestCase):
             msg="Register not working properly!")
 
     def test_login_incomplete(self):
-        answ= self.client.post("/api/v1/register",
+        answ= self.client.post("/api/v2/register",
                 data=self.user_2,content_type='application/json')
 
         wrong_my_data = json.dumps({
                 "username":"anthony"
             })
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=wrong_my_data,
                 content_type='application/json')
 
@@ -139,20 +145,20 @@ class UserViewsCase(unittest.TestCase):
                 "username":"omushambulizi",
                 "password":"luka"
             })        
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=admin_login,
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
         admin_token = output["Token"]
 
-        answ1= self.client.post("/api/v1/login",
+        answ1= self.client.post("/api/v2/login",
                 data=user_login,
                 content_type='application/json')
         output = json.loads(answ1.data.decode())
         user_token = output["Token"]
 
-        answ= self.client.get("/api/v1/users",
+        answ= self.client.get("/api/v2/users",
                 headers={'Authorization': admin_token},
                 content_type='application/json')
 
@@ -160,7 +166,7 @@ class UserViewsCase(unittest.TestCase):
         self.assertEqual(answ.status_code,200,
             msg="Get users not working properly!")
 
-        answ= self.client.get("/api/v1/users",
+        answ= self.client.get("/api/v2/users",
                 headers={'Authorization': user_token},
                 content_type='application/json')
 
@@ -178,32 +184,24 @@ class UserViewsCase(unittest.TestCase):
                 "username":"omushambulizi",
                 "password":"luka"
             })        
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=admin_login,
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
         admin_token = output["Token"]
 
-        answ1= self.client.post("/api/v1/login",
+        answ1= self.client.post("/api/v2/login",
                 data=user_login,
                 content_type='application/json')
         output = json.loads(answ1.data.decode())
         user_token = output["Token"]
 
-        user_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "omushambulizi":
-                user_id = item
+        user_id = self.user_3_data["User"]["user_id"]
 
-        admin_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "etomovich":
-                admin_id = item
+        admin_id = self.user_1_data["User"]["user_id"]
 
-        answ= self.client.get("/api/v1/user/34455556",
+        answ= self.client.get("/api/v2/user/34455556",
                 headers={'Authorization': admin_token},
                 content_type='application/json')
 
@@ -213,7 +211,7 @@ class UserViewsCase(unittest.TestCase):
         self.assertEqual(answ.status_code,400,
             msg="Get a user not working properly!")
 
-        answ= self.client.get("/api/v1/user/"+str(admin_id),
+        answ= self.client.get("/api/v2/user/"+str(admin_id),
                 headers={'Authorization': user_token},
                 content_type='application/json')
 
@@ -221,7 +219,7 @@ class UserViewsCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Get a user not working properly!")
 
-        answ= self.client.get("/api/v1/user/"+str(user_id),
+        answ= self.client.get("/api/v2/user/"+str(user_id),
                 headers={'Authorization': admin_token},
                 content_type='application/json')
 
@@ -241,29 +239,21 @@ class UserViewsCase(unittest.TestCase):
                 "username":"omushambulizi",
                 "password":"luka"
             })        
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=admin_login,
                 content_type='application/json')
         output = json.loads(answ.data.decode())
         admin_token = output["Token"]
 
-        answ1= self.client.post("/api/v1/login",
+        answ1= self.client.post("/api/v2/login",
                 data=user_login,
                 content_type='application/json')
         output = json.loads(answ1.data.decode())
         user_token = output["Token"]
 
-        user_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "omushambulizi":
-                user_id = item
+        user_id = self.user_3_data["User"]["user_id"]
 
-        admin_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "etomovich":
-                admin_id = item
+        admin_id = self.user_1_data["User"]["user_id"]
 
         change=json.dumps({
             "username": "jemmo",
@@ -274,7 +264,7 @@ class UserViewsCase(unittest.TestCase):
             "retype_password":"jim"})
 
 
-        answ= self.client.put("/api/v1/user/34455556",
+        answ= self.client.put("/api/v2/user/34455556",
                 data = change,
                 headers={'Authorization': admin_token},
                 content_type='application/json')
@@ -285,7 +275,7 @@ class UserViewsCase(unittest.TestCase):
         self.assertEqual(answ.status_code,400,
             msg="Edit a user not working properly!")
 
-        answ= self.client.put("/api/v1/user/"+str(admin_id),
+        answ= self.client.put("/api/v2/user/"+str(admin_id),
                 data = change,
                 headers={'Authorization': user_token},
                 content_type='application/json')
@@ -294,7 +284,7 @@ class UserViewsCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Edit a user not working properly!")
 
-        answ= self.client.put("/api/v1/user/"+str(user_id),
+        answ= self.client.put("/api/v2/user/"+str(user_id),
                 data = change,
                 headers={'Authorization': admin_token},
                 content_type='application/json')
@@ -315,32 +305,26 @@ class UserViewsCase(unittest.TestCase):
                 "username":"omushambulizi",
                 "password":"luka"
             })        
-        answ= self.client.post("/api/v1/login",
+        answ= self.client.post("/api/v2/login",
                 data=admin_login,
                 content_type='application/json')
                 
         output = json.loads(answ.data.decode())
+        print(output)
         admin_token = output["Token"]
 
-        answ1= self.client.post("/api/v1/login",
+        answ1= self.client.post("/api/v2/login",
                 data=user_login,
                 content_type='application/json')
         output = json.loads(answ1.data.decode())
         user_token = output["Token"]
 
-        user_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "omushambulizi":
-                user_id = item
+        user_id = self.user_3_data["User"]["user_id"]
 
-        admin_id = ""
-        for item in SystemUsers.send_it_users.keys():
-            if SystemUsers.send_it_users[item]['username'] \
-            == "etomovich":
-                admin_id = item
+        admin_id = self.user_1_data["User"]["user_id"]
 
-        answ= self.client.delete("/api/v1/user/34455556",
+
+        answ= self.client.delete("/api/v2/user/34455556",
                 headers={'Authorization': admin_token},
                 content_type='application/json')
 
@@ -350,7 +334,7 @@ class UserViewsCase(unittest.TestCase):
         self.assertEqual(answ.status_code,400,
             msg="Get a user not working properly!")
 
-        answ= self.client.delete("/api/v1/user/"+str(admin_id),
+        answ= self.client.delete("/api/v2/user/"+str(admin_id),
                 headers={'Authorization': user_token},
                 content_type='application/json')
 
@@ -358,7 +342,7 @@ class UserViewsCase(unittest.TestCase):
         self.assertEqual(answ.status_code,401,
             msg="Get a user not working properly!")
 
-        answ= self.client.delete("/api/v1/user/"+str(user_id),
+        answ= self.client.delete("/api/v2/user/"+str(user_id),
                 headers={'Authorization': admin_token},
                 content_type='application/json')
 

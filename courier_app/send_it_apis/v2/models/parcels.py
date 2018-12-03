@@ -223,7 +223,7 @@ class SendItParcels(object):
                     (parcel_name, submission_station, present_location,
                     weight, expected_pay,order_id,feedback,destination,submission_date,
                     status,approved, owner_id) 
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""" 
                  
                 the_record = (parcel_name, submission_station, present_location,weight,
                      expected_pay,order_id,feedback,destination,submission_date,
