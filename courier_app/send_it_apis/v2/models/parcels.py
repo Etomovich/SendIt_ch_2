@@ -501,7 +501,7 @@ class SendItParcels(object):
                 con.close()
                 print("PostgreSQL connection is closed")
                 payload = self.db_parcel(parcel_id)
-                payload["message"] = "Destination Change"
+                payload["message"] = "Destination Changed"
                 return payload
             except (Exception, psycopg2.Error) as error:
                 cur.close()
@@ -591,8 +591,6 @@ class SendItParcels(object):
             
 
         return {"message":"UNAUTHORIZED"}
-
-
 
     def delete_parcel(self, parcel_id):
         '''This method deletes a parcels in the system which makes it an 

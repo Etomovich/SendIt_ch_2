@@ -361,9 +361,17 @@ class ParcelViewCase(unittest.TestCase):
                 data = self.mk_parcel,
                 headers={'Authorization': self.admin_token},
                 content_type='application/json')
-        
+
         output = json.loads(answ.data.decode())
         self.parcel_id = output["parcel_id"]
+
+        answ= self.client.put("/api/v2/parcels/"+str(23)+
+                "/cancel",
+                headers={'Authorization': self.user_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Cancel a parcel not working properly!")
 
         answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+
                 "/cancel",
@@ -372,9 +380,9 @@ class ParcelViewCase(unittest.TestCase):
 
         output = json.loads(answ.data.decode())
         self.assertEqual(output['message'],"cancelled",
-            msg="Delete a parcel not working properly!")
+            msg="Cancel a parcel not working properly!")
         self.assertEqual(answ.status_code,200,
-            msg="Delete a parcel not working properly!")
+            msg="Cancel a parcel not working properly!")
 
         answ= self.client.delete("/api/v2/parcels/"+str(self.parcel_id),
                 headers={'Authorization': '3455666'},
@@ -395,3 +403,476 @@ class ParcelViewCase(unittest.TestCase):
         output = json.loads(answ.data.decode())
         self.assertEqual(answ.status_code,400,
             msg="Delete a parcel not working properly!")
+
+    def test_destination_changer(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output['destination'],"",
+            msg="Adding a parcel should have empty string destination by default.")
+
+        new_destination=json.dumps({
+            "destination": "Mombasa"
+        })
+        destination_not_string =json.dumps({
+            "destination": 30
+        })
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/destination",
+                data = new_destination,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['message'],"UNAUTHORIZED",
+            msg="Destination changer not working properly!!")
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/destination",
+                data = new_destination,
+                headers={'Authorization': self.user_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        print(answ.status_code)
+        self.assertEqual(output['message'],"Destination Changed",
+            msg="Destination changer not working properly!!")
+
+        self.assertEqual(output['destination'],"Mombasa",
+            msg="Adding a parcel should have empty destination by default.")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Destination changer not working properly!!")
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/destination",
+                data = destination_not_string,
+                headers={'Authorization': self.user_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Destination changer not working properly!!")
+
+    def test_status_changer(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output["status"],"not_started",
+            msg="The status of a parcel should be by default 'not_started'!!")
+
+        new_status =json.dumps({
+            "status": "in_transit"
+        })
+        wrong_status=json.dumps({
+            "status": "my_status"
+        })
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/status",
+                data = new_status,
+                headers={'Authorization': self.user_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,401,
+            msg="Status changer not working properly!!")
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/status",
+                data = new_status,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['message'],"EDITED",
+            msg="Status changer not working properly!!")
+
+        self.assertEqual(output['Status'],"OK",
+            msg="Status changer not working correctly!!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Destination changer not working properly!!")
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/status",
+                data = wrong_status,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Status changer not working properly!!")
+
+    def test_location_changer(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output["present_location"],"Nakuru",
+            msg="The status of a parcel should be by default 'not_started'!!")
+
+        new_location =json.dumps({
+            "present_location": "Kisumu"
+        })
+        wrong_location=json.dumps({
+            "present_location": 50
+        })
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/presentLocation",
+                data = new_location,
+                headers={'Authorization': self.user_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,401,
+            msg="present location changer not working properly!!")
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/presentLocation",
+                data = new_location,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        print(answ.status_code)
+        self.assertEqual(output['message'],"EDITED",
+            msg="present location  changer not working properly!!")
+
+        self.assertEqual(output['Status'],"OK",
+            msg="present location  changer not working correctly!!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="present location changer not working properly!!")
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/presentLocation",
+                data = wrong_location,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="present location changer not working properly!!")
+
+    def test_delivered_parcels(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output["owner_id"],self.user_id,
+            msg="Error in making parcel [owner_id]!!")
+
+        new_status =json.dumps({
+            "status": "delivered"
+        })
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/status",
+                data = new_status,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+
+        self.assertEqual(output['Status'],"OK",
+            msg="Status changer not working correctly!!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Status changer not working properly!!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/delivered",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Get parcel delivery by user id not working properly!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/delivered",
+                headers={'Authorization': '45566'},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,401,
+            msg="Get parcel delivery by user id not working properly!")
+        
+        answ= self.client.get("/api/v2/parcels/"+str(self.user_id)+"/delivered",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['Status'],"OK",
+            msg="Get delivered parcels not working correctly!!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Get delivered parcels not working properly!!")
+
+    def test_cancelled_parcels(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output["owner_id"],self.user_id,
+            msg="Error in making parcel [owner_id]!!")
+
+        new_status =json.dumps({
+            "status": "cancelled"
+        })
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/status",
+                data = new_status,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+
+        self.assertEqual(output['Status'],"OK",
+            msg="Status changer not working correctly!!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Status changer not working properly!!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/cancelled",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Get cancelled parcels not working properly!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/cancelled",
+                headers={'Authorization': '45566'},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,401,
+            msg="Get cancelled parcels not working properly!")
+        
+        answ= self.client.get("/api/v2/parcels/"+str(self.user_id)+"/cancelled",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['Status'],"OK",
+            msg="Get cancelled parcels not working properly!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Get cancelled parcels not working properly!")
+
+    def test_intransit_parcels(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output["owner_id"],self.user_id,
+            msg="Error in making parcel [owner_id]!!")
+
+        new_status =json.dumps({
+            "status": "in_transit"
+        })
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/status",
+                data = new_status,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+
+        self.assertEqual(output['Status'],"OK",
+            msg="Status changer not working correctly!!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Status changer not working properly!!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/in-transit",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Get in_transit parcels not working properly!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/in-transit",
+                headers={'Authorization': '45566'},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,401,
+            msg="Get in_transit parcels not working properly!")
+        
+        answ= self.client.get("/api/v2/parcels/"+str(self.user_id)+"/in-transit",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['Status'],"OK",
+            msg="Get in_transit parcels not working properly!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Get in_transit parcels not working properly!")
+
+    def test_notstarted_parcels(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output["owner_id"],self.user_id,
+            msg="Error in making parcel [owner_id]!!")
+
+        new_status =json.dumps({
+            "status": "not_started"
+        })
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id)+"/status",
+                data = new_status,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+
+        self.assertEqual(output['Status'],"OK",
+            msg="Status changer not working correctly!!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Status changer not working properly!!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/not-started",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Get not-started parcels not working properly!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/not-started",
+                headers={'Authorization': '45566'},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,401,
+            msg="Get not-started parcels not working properly!")
+        
+        answ= self.client.get("/api/v2/parcels/"+str(self.user_id)+"/not-started",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['Status'],"OK",
+            msg="Get not-started parcels not working properly!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Get not-started parcels not working properly!") 
+
+    def test_get_approved_parcels(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output["owner_id"],self.user_id,
+            msg="Error in making parcel [owner_id]!!")
+
+        approve_parcel =json.dumps({
+            "approved": "approved"
+        })
+
+        answ= self.client.put("/api/v2/parcels/"+str(self.parcel_id),
+                data = approve_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+
+        self.assertEqual(output['message'],"EDITED",
+            msg="Parcel editor not working correctly!!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Parcel editor not working properly!!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/approved",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Get approved parcels not working properly!")
+
+        answ= self.client.get("/api/v2/parcels/"+str(23)+
+                "/approved",
+                headers={'Authorization': '45566'},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,401,
+            msg="Get approved parcels not working properly!")
+        
+        answ= self.client.get("/api/v2/parcels/"+str(self.user_id)+"/approved",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['Status'],"OK",
+            msg="Get approved parcels not working properly!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Get approved parcels not working properly!")
+    
+    def test_get_user_parcels_by_id(self):
+        answ= self.client.post("/api/v2/parcels",
+                data = self.mk_parcel,
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+        
+        output = json.loads(answ.data.decode())
+        self.parcel_id = output["parcel_id"]
+
+        self.assertEqual(output["owner_id"],self.user_id,
+            msg="Error in making parcel [owner_id]!!")
+
+
+        answ= self.client.get("/api/v2/users/"+str(23)+
+                "/parcels",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,400,
+            msg="Get a user's parcels not working properly!")
+
+        answ= self.client.get("/api/v2/users/"+str(23)+
+                "/parcels",
+                headers={'Authorization': '45566'},
+                content_type='application/json')
+
+        self.assertEqual(answ.status_code,401,
+            msg="Get a user's parcels not working properly!")
+        
+        answ= self.client.get("/api/v2/users/"+str(self.user_id)+"/parcels",
+                headers={'Authorization': self.admin_token},
+                content_type='application/json')
+
+        output = json.loads(answ.data.decode())
+        self.assertEqual(output['Status'],"OK",
+            msg="Get a user's parcels not working properly!")
+
+        self.assertEqual(answ.status_code,200,
+            msg="Get a user's parcels not working properly!")

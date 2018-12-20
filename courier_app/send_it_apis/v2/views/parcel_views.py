@@ -462,7 +462,7 @@ class DestinationChanger(Resource):
                 destination = result.data['destination']
                 )
 
-            if reply["message"] == 'EDITED':
+            if reply["message"] == "Destination Changed":
                 reply["Status"] = "OK"
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
@@ -474,7 +474,6 @@ class DestinationChanger(Resource):
         answer = make_response(jsonify(pack),400)
         answer.content_type='application/json;charset=utf-8'
         return answer
-
 
 class LocationChanger(Resource):
     """Admin view"""
