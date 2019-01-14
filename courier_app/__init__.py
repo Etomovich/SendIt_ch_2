@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 import psycopg2
 from instance.config import Config, MyDatabasebUrl, TestConfiguration
 from courier_app.send_it_apis.v1 import bp as api_v1_bp
@@ -16,7 +17,8 @@ def create_app(config_class=Config, testing=False):
         MyDatabasebUrl.CURRENT_URL = TestConfiguration.TEST_URL
 
     my_tables = create_relations()
-        
+    
+    CORS(app)        
     v1_bp.init_app(app)
 
     v2_bp.init_app(app) 
