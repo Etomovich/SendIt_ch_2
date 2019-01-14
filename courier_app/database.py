@@ -1,14 +1,15 @@
 import psycopg2
 from psycopg2 import connect
-from instance.config import Config
+from instance.config import MyDatabasebUrl
 
-print
 def connection():
     try:
-        con = psycopg2.connect(Config.MAIN_URL)
+        print("Establishing connection to Postgres DB....")
+        con = psycopg2.connect(MyDatabasebUrl.CURRENT_URL)
         return con
     except (Exception, psycopg2.Error) as error :
         print ("Connection to Postgres Failed!! ", error)
+
 
 def create_relations():
     con = connection()
@@ -21,11 +22,11 @@ def create_relations():
     return True
 
 def remove_all_tables():
-    con = connection(url)
+    con = connection()
     cur = con.cursor()
-    tab1 = """DROP TABLE IF EXIST sendit_users CASCADE"""
-    tab2 = """DROP TABLE IF EXIST sendit_orders CASCADE"""
-    tab3 = """DROP TABLE IF EXIST sendit_parcels CASCADE"""
+    tab1 = """DROP TABLE sendit_users CASCADE"""
+    tab2 = """DROP TABLE sendit_orders CASCADE"""
+    tab3 = """DROP TABLE sendit_parcels CASCADE"""
     cur.execute(tab1)
     cur.execute(tab2)
     cur.execute(tab3)
@@ -42,7 +43,8 @@ def sendit_relations():
             email           VARCHAR(50)  UNIQUE NOT NULL,
             phone_number    VARCHAR(20)  UNIQUE NOT NULL,
             role            VARCHAR(10)  NOT NULL,
-            password        VARCHAR(100)  NOT NULL);
+            password        VARCHAR(100)  NOT NULL
+        );
     """
     tab2="""
         CREATE TABLE IF NOT EXISTS sendit_parcels(
@@ -50,7 +52,7 @@ def sendit_relations():
             parcel_name         VARCHAR(50)  NOT NULL,
             submission_station  VARCHAR(50)  NOT NULL,
             present_location    VARCHAR(50)  NOT NULL,
-            weight              NUMERIC(20, 2) NOT NULL,
+            weight              NUMERIC(20, 2) NOT NULL DEFAULT 0.0,
             expected_pay        NUMERIC(20, 2) NULL DEFAULT 0.0,
             order_id            INTEGER NULL,
             feedback            VARCHAR(300)  NULL,
@@ -58,10 +60,9 @@ def sendit_relations():
             submission_date     TIMESTAMP WITH TIME ZONE NOT NULL,
             status              VARCHAR(20)  DEFAULT 'not-started',
             approved            VARCHAR(20)  DEFAULT 'No',
-            owner_id            INTEGER REFERENCES sendit_users(user_id) ON DELETE CASCADE
+            owner_id            INTEGER NULL
         );
     """
-
     tab3="""
         CREATE TABLE IF NOT EXISTS sendit_orders(
             order_id            SERIAL PRIMARY KEY,
@@ -76,7 +77,8 @@ def sendit_relations():
             feedback            VARCHAR(300)  NULL,
             owner_id            INTEGER REFERENCES sendit_users(user_id) ON DELETE CASCADE,
             parcel_id           INTEGER REFERENCES sendit_parcels(parcel_id) ON DELETE CASCADE
-            );
-    """
-    
-    return [tab1,tab2,tab3]
+        );
+    """   
+    return [tab1, tab2, tab3]
+ 
+ 
