@@ -301,7 +301,8 @@ class SystemUsers(object):
                 if check_password_hash(out_data["password"], password):
                     s = Serializer(Config.SECRET_KEY, expires_in=21600)
                     token = (s.dumps({'user_id': out_data["user_id"]})).decode("ascii")
-                    return token
+                    out_data["token"] = token
+                    return out_data
                 else:
                      return False
             return False
