@@ -79,6 +79,7 @@ class SystemUsers(object):
             con.close()
             print("User failed to load", error)
             print("PostgreSQL connection is closed")
+            return False
 
     def _fetch_db_user(self, user_id): 
         try:
@@ -107,6 +108,7 @@ class SystemUsers(object):
             con.close()
             print("User failed to load", error)
             print("PostgreSQL connection is closed")
+            return False
                 
     def edit_user(self, user_id, username=None, email=None, phone_no=None,
                   password=None, role=None):

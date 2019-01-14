@@ -57,14 +57,14 @@ class SendItParcels(object):
             print("PostgreSQL connection is closed")
             if record:
                 out_data = {
-                    "message": "CREATED",
+                    "message": "OK",
                     "parcel_id": record[0],
                     "parcel_name": record[1],
                     "submission_station": record[2],
                     "present_location": record[3],
                     "weight": str(record[4]),
                     "expected_pay": str(record[5]),
-                    "order_id": str(record[6]),
+                    "order_id": record[6],
                     "feedback": record[7],
                     "destination": record[8],
                     "submission_date": str(record[9]),
@@ -459,7 +459,33 @@ class SendItParcels(object):
                     print("PostgreSQL connection is closed")
 
             if status:
+                from courier_app.send_it_apis.v2.models import SendItUserOrders
                 try:
+                    #check if order is processed and parcel is approved
+                    parcel_info = self.db_parcel(parcel_id)
+                    if parcel_info["approved"] != "approved":
+                        reply = {}
+                        reply["Status"] = "bad"
+                        reply["message"] = "The parcel has to be approved before"+\
+                            " you can change its status"
+                        return reply
+
+                    order_instance = SendItUserOrders(0000)
+                    order_info = order_instance.db_order(int(parcel_info["order_id"]))
+                    if not order_info:
+                        reply = {}
+                        reply["Status"] = "bad"
+                        reply["message"] = "This parcel needs an order from the owner for"+\
+                            " you to change the status."
+                        return reply
+                    if order_info["order_status"] != "accepted":
+                        reply = {}
+                        reply["Status"] = "bad"
+                        reply["message"] = "The order of this parcel <order_status> has to"+\
+                            " be 'accepted' for you to change its status."
+                        return reply
+
+
                     con = connection()
                     cur = con.cursor()
                     insert_query = """ Update sendit_parcels set status= %s
@@ -478,6 +504,7 @@ class SendItParcels(object):
     
             payload = self.db_parcel(parcel_id)
             payload["message"] = "EDITED"
+            payload['Status'] = "OK"
             return payload
 
         return {"message":"UNAUTHORIZED"} 
@@ -571,7 +598,7 @@ class SendItParcels(object):
                         "present_location": item[3],
                         "weight": str(item[4]),
                         "expected_pay": str(item[5]),
-                        "order_id": str(item[6]),
+                        "order_id": item[6],
                         "feedback": item[7],
                         "destination": item[8],
                         "submission_date": str(item[9]),

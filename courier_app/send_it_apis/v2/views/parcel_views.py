@@ -507,7 +507,7 @@ class LocationChanger(Resource):
         return answer
 
 class StatusChanger(Resource):
-    """Admin view"""
+    """Admin view""" 
     def put(self, parcel_id):
         auth_user = _authenticate_admin()
         if not isinstance(auth_user, dict):
@@ -525,10 +525,15 @@ class StatusChanger(Resource):
                 )
 
             if reply["message"] == 'EDITED':
-                reply["Status"] = "OK"
                 answer = make_response(jsonify(reply),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
+            
+            if reply["Status"] == 'bad':
+                answer = make_response(jsonify(reply),400)
+                answer.content_type='application/json;charset=utf-8'
+                return answer
+
             answer = make_response(jsonify(reply),401)
             answer.content_type='application/json;charset=utf-8'
             return answer

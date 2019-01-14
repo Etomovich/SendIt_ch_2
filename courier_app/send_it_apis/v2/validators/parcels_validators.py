@@ -73,7 +73,7 @@ class EditParcelSchema(Schema):
         con = connection()
         cur = con.cursor()
 
-        select_query = """select * from sendit_parcels where owner_id= %s """
+        select_query = """select * from sendit_users where user_id= %s"""
         cur.execute(select_query,(int(owner_id),))
         record = cur.fetchone()
 
@@ -98,7 +98,7 @@ class EditParcelSchema(Schema):
         con = connection()
         cur = con.cursor()
 
-        select_query = """select * from sendit_parcels where order_id= %s """
+        select_query = """select * from sendit_orders where order_id= %s """
         cur.execute(select_query,(int(order_id),))
         record = cur.fetchone()
 
@@ -128,10 +128,10 @@ class EditParcelSchema(Schema):
 
     @validates("approved")
     def validate_approved(self, approved):
-        accepted = ['approved','not_yet',]
+        accepted = ['approved','No',]
         if approved not in accepted:
             raise ValidationError\
-            ("[status] Order status can takeup one of 'approved','not_yet'")
+            ("[status] Order status can takeup one of 'approved','No'")
 
 class ParcelIdSchema(Schema):
     parcel_id = fields.Integer(required=True)
