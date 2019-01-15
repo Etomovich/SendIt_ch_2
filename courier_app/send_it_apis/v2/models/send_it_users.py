@@ -14,7 +14,7 @@ class SystemUsers(object):
     def __init__(self, current_user_id):
         self.current_user_id = int(current_user_id)
 
-    def add_user(self, username, email, phoneNo, password, role):
+    def add_user(self, username, email, phoneNo, password, role="User"):
         '''This method adds a new user to the database'''
         try:
             con = connection()

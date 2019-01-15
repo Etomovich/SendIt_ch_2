@@ -14,7 +14,6 @@ class CreateUserSchema(Schema):
     phone_number = fields.String(required =True)
     password = fields.String(required =True)
     retype_password = fields.String(required =True)
-    role = fields.String(required =True)
 
     @validates_schema
     def validate_password_retype_equality(self, data):
