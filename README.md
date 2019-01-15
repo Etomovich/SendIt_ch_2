@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/Etomovich/SendIt_ch_2/badge.svg?branch=chall-3-full)](https://coveralls.io/github/Etomovich/SendIt_ch_2?branch=chall-3-full)[![Build Status](https://travis-ci.org/Etomovich/SendIt_ch_2.svg?branch=chall-3-full)](https://travis-ci.org/Etomovich/SendIt_ch_2.svg?branch=chall-3-full)
+[![Coverage Status](https://coveralls.io/repos/github/Etomovich/SendIt_ch_2/badge.svg?branch=develop1)](https://coveralls.io/github/Etomovich/SendIt_ch_2?branch=develop1)[![Build Status](https://travis-ci.org/Etomovich/SendIt_ch_2.svg?branch=develop1)](https://travis-ci.org/Etomovich/SendIt_ch_2.svg?branch=develop1)
 
 **SEND IT COURIER SERVICE** 
 

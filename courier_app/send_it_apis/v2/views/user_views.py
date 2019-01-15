@@ -60,7 +60,8 @@ class UserLogin(Resource):
                     "Status": "Logged In.", 
                     "Token": reply["token"],
                     "role": reply["role"],
-                    "username":reply["username"]
+                    "username":reply["username"],
+                    "user_id": reply["user_id"]
                 }
                 answer = make_response(jsonify(pack), 200)
                 answer.content_type = 'application/json;charset=utf-8'
