@@ -28,9 +28,12 @@ class CreateUser(Resource):
 
         if len(result.errors) < 1:
             creator = SystemUsers(00)
-            person = creator.add_user(result.data['username'], result.data['email'],
-                                      result.data['phone_number'], result.data['password'],
-                                      result.data['role'])
+            person = creator.add_user(
+                username= result.data['username'], 
+                email= result.data['email'],
+                phoneNo=result.data['phone_number'], 
+                password= result.data['password']
+            )
             pack = {"Status": "Created", "User": person}
             answer = make_response(jsonify(pack), 201)
             answer.content_type = 'application/json;charset=utf-8'

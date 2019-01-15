@@ -14,7 +14,6 @@ class CreateUserSchema(Schema):
     phone_number = fields.String(required =True)
     password = fields.String(required =True)
     retype_password = fields.String(required =True)
-    role = fields.String(required =True)
 
     @validates_schema
     def validate_password_retype_equality(self, data):
@@ -25,11 +24,6 @@ class CreateUserSchema(Schema):
             raise ValidationError\
             ("[password] cannot be null")
 
-    @validates("role")
-    def validate_role(self, role):
-        if role != "Admin" and role != "User":
-            raise ValidationError\
-            ("[role] can either be Admin or User.")
 
     @validates("username")
     def validate_unique_username(self,username):
