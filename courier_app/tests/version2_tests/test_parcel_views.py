@@ -7,7 +7,7 @@ from courier_app.send_it_apis.v2.models import (SystemUsers,
 from itsdangerous import (TimedJSONWebSignatureSerializer
      as Serializer, BadSignature, SignatureExpired)
 from courier_app import create_app
-from courier_app.database import remove_all_tables
+from courier_app.database import remove_all_tables, add_root_user
 
 class ParcelViewCase(unittest.TestCase):
 
@@ -20,13 +20,22 @@ class ParcelViewCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
 
-        self.user_1=json.dumps(
-            {"username":"etomovich",
+        self.user_1={
+            "username":"etomovich",
             "email":"etomovich@gmail.com",
             "phone_number":"078",
             "password":"etole",
-            "role":"Admin",
-            "retype_password":"etole"})
+            "role":"Admin"
+        }
+        self.user_1_data = {}
+        self.user_1_data["Status"] = "OK"
+        self.user_1_data["User"] = add_root_user(
+            username = self.user_1["username"],
+            email=self.user_1["email"],
+            phone_number=self.user_1["phone_number"],
+            password=self.user_1["password"],
+            role=self.user_1["role"]
+        )
         
         self.user_2=json.dumps(
             {"username":"anthony",
@@ -48,11 +57,6 @@ class ParcelViewCase(unittest.TestCase):
                 data=self.user_3,content_type='application/json')
 
         self.user_3_data = json.loads(answ.data.decode())
-
-        answ= self.client.post("/api/v2/register",
-                data=self.user_1,content_type='application/json')
-
-        self.user_1_data = json.loads(answ.data.decode())
 
         answ= self.client.post("/api/v2/register",
                 data=self.user_2,content_type='application/json')

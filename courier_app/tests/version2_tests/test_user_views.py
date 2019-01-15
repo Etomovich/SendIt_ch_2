@@ -7,7 +7,7 @@ from courier_app.send_it_apis.v2.models import (SystemUsers,
 from itsdangerous import (TimedJSONWebSignatureSerializer
      as Serializer, BadSignature, SignatureExpired)
 from courier_app import create_app
-from courier_app.database import remove_all_tables
+from courier_app.database import remove_all_tables, add_root_user
 
 class UserViewsCase(unittest.TestCase):
     def setUp(self):
@@ -19,22 +19,39 @@ class UserViewsCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
 
-        self.user_1=json.dumps(
-            {"username":"etomovich",
+        self.user_1={
+            "username":"etomovich",
             "email":"etomovich@gmail.com",
             "phone_number":"078",
             "password":"etole",
-            "role":"Admin",
-            "retype_password":"etole"})
-
-        self.user=json.dumps(
-            {"username":"anthony",
+            "role":"Admin"
+        }
+        
+        self.user={
+            "username":"anthony",
             "email":"anto@gmail.com",
             "phone_number":"+25423",
             "password":"kimani",
-            "role":"Admin",
-            "retype_password":"kimani"})
-
+            "role":"Admin"
+        }
+        self.user_1_data = {}
+        self.user_1_data["Status"] = "OK"
+        self.user_1_data["User"] = add_root_user(
+            username = self.user_1["username"],
+            email=self.user_1["email"],
+            phone_number=self.user_1["phone_number"],
+            password=self.user_1["password"],
+            role=self.user_1["role"]
+        )
+        self.user_data = {}
+        self.user_data["Status"] = "OK"
+        self.user_data["User"] = add_root_user(
+            username = self.user["username"],
+            email=self.user["email"],
+            phone_number=self.user["phone_number"],
+            password=self.user["password"],
+            role=self.user["role"]
+        )
         self.user_2=json.dumps(
             {"username":"anthony",
             "email":"anto",
@@ -58,15 +75,22 @@ class UserViewsCase(unittest.TestCase):
         answ= self.client.post("/api/v2/register",
                 data=self.user_1,content_type='application/json')
 
-        self.user_1_data = json.loads(answ.data.decode())
        
     def tearDown(self):
         toa = remove_all_tables()
 
     def test_create_user(self):
+        my_trial = json.dumps(
+            {"username":"theuser",
+            "email":"theuser@gmail.com",
+            "phone_number":"+2543777",
+            "password":"theuser",
+            "role":"User",
+            "retype_password":"theuser"})
         answ= self.client.post("/api/v2/register",
-                data=self.user,content_type='application/json')
+                data=my_trial,content_type='application/json')
         output = json.loads(answ.data.decode())
+        print(output)
         self.assertEqual(output['Status'],"Created",
             msg="Register not working properly!")
         self.assertEqual(answ.status_code,201,
@@ -163,6 +187,7 @@ class UserViewsCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
+        print(output)
         self.assertEqual(answ.status_code,200,
             msg="Get users not working properly!")
 
@@ -252,7 +277,7 @@ class UserViewsCase(unittest.TestCase):
         user_token = output["Token"]
 
         user_id = self.user_3_data["User"]["user_id"]
-
+        print(self.user_1_data)
         admin_id = self.user_1_data["User"]["user_id"]
 
         change=json.dumps({
@@ -260,7 +285,6 @@ class UserViewsCase(unittest.TestCase):
             "email":"jemo@gmail.com",
             "phone_number":"+20000",
             "password":"jim",
-            "role":"User",
             "retype_password":"jim"})
 
 
@@ -290,6 +314,7 @@ class UserViewsCase(unittest.TestCase):
                 content_type='application/json')
 
         output = json.loads(answ.data.decode())
+        print(output)
         self.assertEqual(output['Status'],"Success",
             msg="Edit a user not working properly!")
         self.assertEqual(answ.status_code,200,

@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2 import connect
 from instance.config import MyDatabasebUrl
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def connection():
     try:
@@ -33,6 +34,55 @@ def remove_all_tables():
     con.commit()
     con.close()
     return True
+
+def add_root_user(username,email,phone_number,role,password):
+    try:
+        con = connection()
+        cur = con.cursor()
+        root_user = {
+            "username":str(username),
+            "email":str(email),
+            "phone_number":str(phone_number),
+            "password":str(password),
+            "role":str(role)}
+        insert_query = """ INSERT INTO sendit_users 
+            (username, email, phone_number, role, password) 
+            VALUES (%s,%s,%s,%s,%s)"""
+        the_record = (
+            root_user["username"], 
+            root_user["email"], 
+            root_user["phone_number"], 
+            root_user["role"], 
+            generate_password_hash(root_user["password"])
+        )
+        cur.execute(insert_query, the_record)
+        con.commit()
+
+        select_query = """select * from sendit_users where username = %s"""
+        cur.execute(select_query, (root_user["username"], ))
+        record = cur.fetchone()
+
+        cur.close()
+        con.close()
+
+        print("PostgreSQL connection is closed")
+
+        out_data = {
+            "user_id": record[0],
+            "username": record[1],
+            "email": record[2],
+            "phone_number": record[3],
+            "role": record[4]
+        }
+        return out_data
+
+    except (Exception, psycopg2.Error) as error:
+        cur.close()
+        con.close()
+        print("Failed to insert record into sendit_users table", error)
+        print("PostgreSQL connection is closed")
+        return False
+
 
 def sendit_relations():
     '''Creates all the tables in the database.'''
