@@ -142,15 +142,13 @@ class SendItUserOrders(object):
                     payload["feedback"],payload["owner_id"], 
                     payload["parcel_id"])
                 cur.execute(insert_query, the_record)
-                
+               
                 con.commit()
 
                 select_query = """select * from sendit_orders where parcel_id = %s"""
                 cur.execute(select_query, (parcel_id, ))
                 record = cur.fetchone()
 
-                cur.close()
-                con.close()
                 print("PostgreSQL connection is closed")
 
                 out_data = {
@@ -168,6 +166,17 @@ class SendItUserOrders(object):
                     "owner_id": record[10],
                     "parcel_id": record[11]
                 }
+
+                #Assign order to parcel
+                insert_query = """ Update sendit_parcels set order_id= %s
+                        where parcel_id= %s"""
+                the_record = (out_data["order_id"],out_data["parcel_id"])
+                cur.execute(insert_query, the_record)
+
+                con.commit()
+                
+                cur.close()
+                con.close()
                 return out_data
 
             except (Exception, psycopg2.Error) as error:
@@ -401,7 +410,6 @@ class SendItUserOrders(object):
         This method is useful if a user has made a premature submission
         or order has been rejected and wants to redo the order. NB: if
         the order is accepted you cannot remove submission''' 
-
         this_user = self._user_is_there()
         this_order = self.db_order(int(order_id))
         if this_user and (this_user["user_id"]== this_order["owner_id"]):
@@ -621,6 +629,12 @@ class SendItUserOrders(object):
                 cur = con.cursor()
                 delete_query = """Delete from sendit_orders where order_id= %s"""
                 cur.execute(delete_query, (int(order_id), ))
+                
+                order_id = 0
+                insert_query = """ Update sendit_parcels set order_id= %s
+                        where parcel_id= %s"""
+                the_record = (order_id, the_order["parcel_id"])
+                cur.execute(insert_query, the_record)
                 con.commit()
                 cur.close()
                 con.close()
@@ -647,6 +661,13 @@ class SendItUserOrders(object):
                 cur = con.cursor()
                 delete_query = """Delete from sendit_orders where order_id= %s"""
                 cur.execute(delete_query, (int(order_id), ))
+
+                order_id = 0
+                insert_query = """ Update sendit_parcels set order_id= %s
+                        where parcel_id= %s"""
+                the_record = (order_id, the_order["parcel_id"])
+                cur.execute(insert_query, the_record)
+
                 con.commit()
                 cur.close()
                 con.close()

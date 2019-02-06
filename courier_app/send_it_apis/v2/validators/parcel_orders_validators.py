@@ -39,6 +39,12 @@ class AddOrderSchema(Schema):
             raise ValidationError\
             ("[parcel_id] The Parcel ID does not exist.")
 
+        the_parcel101 = SendItParcels(0000)
+        parcel_data = the_parcel101.db_parcel(parcel_id)
+        if parcel_data and parcel_data["order_id"] != 0:
+            raise ValidationError\
+            ("[parcel_id] The Parcel ID already has an order. Try editing the order.") 
+
 class EditOrderSchema(Schema):
     order_id = fields.Integer(required=True)
     parcel_name = fields.String()

@@ -66,6 +66,8 @@ class AllOrders(Resource):
         if len(result.errors) < 1:
             this_data ={
                 "parcel_id": result.data["parcel_id"],
+                "parcel_name": result.data["parcel_name"] if\
+                    "parcel_name" in result.data else None,
                 "parcel_description": result.data["parcel_description"] if\
                     "parcel_description" in result.data else None,
                 "pay_mode": result.data["pay_mode"] if\
@@ -80,6 +82,7 @@ class AllOrders(Resource):
             create_order = SendItUserOrders(auth_user['user_id'])
             reply = create_order.add_order(
                 parcel_id = this_data['parcel_id'],\
+                parcel_name = this_data['parcel_name'],\
                 parcel_description=this_data['parcel_description'],\
                 pay_mode=this_data['pay_mode'],\
                 pay_proof=this_data['pay_proof'],
@@ -115,7 +118,7 @@ class MyOrderView(Resource):
                 answer = make_response(jsonify(pack),200)
                 answer.content_type='application/json;charset=utf-8'
                 return answer
-            answer = make_response(jsonify(pack),404)
+            answer = make_response(jsonify(pack),401)
             answer.content_type='application/json;charset=utf-8'
             return answer
         pack = {"Status":"Bad Request","Errors":result.errors}
